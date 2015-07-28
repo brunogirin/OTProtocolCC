@@ -74,26 +74,28 @@ namespace OTProtocolCC
     // This representation is immutable.
     struct CC1Alert
         {
-        CC1Alert(uint8_t _hc1, _hc2) : hc1(_hc1_), hc2(_hc2), ext1(1), ext2(1) { }
+        CC1Alert(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1), hc2(_hc2), ext1(1), ext2(1) { }
         const uint8_t hc1, hc2,
         const uint8_t ext1, ext2;
         };
 
     // CC1PollAndCommand contains:
     //   * House code (hc1, hc2) of valve controller that the poll/command is being sent to.
-    //   * rad-open-percent     [0,100] 0-100 in 1% steps, percent open approx to set rad valve (ro)
+    //   * rad-open-percent     [0,100] 0-100 in 1% steps, percent open approx to set rad valve (rp)
     //   * light-colour         [0,3] bit flags 1 is red 2 is green (lc)
     //   * light-on-time        [0,15] 0-30s in units of 2s (lt)
     //   * Two extension bytes, currently reserved and of value 1.
     // Should generally be fixed length on the wire, and protected by non-zero version of CRC7_5B.
-    //     '?' 6 hc2 hc2 ro lclt 1 1 crc
+    //     '?' 6 hc2 hc2 rp lclt 1 1 crc
     // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
     // This representation is immutable.
     struct CC1PollAndCommand
         {
-        CC1PollAndCommand(uint8_t _hc1, _hc2) : hc1(_hc1_), hc2(_hc2),      ext1(1), ext2(1) { }
+        CC1PollAndCommand(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1_), hc2(_hc2),      ext1(1), ext2(1) { }
         const uint8_t hc1, hc2,
-
+        const uint8_t rp;
+        const uint8_t lc;
+        const uint8_t lt;
         const uint8_t ext1, ext2;
         };
 
@@ -113,9 +115,13 @@ namespace OTProtocolCC
     // This representation is immutable.
     struct CC1PollResponse
         {
-        CC1PollResponse(uint8_t _hc1, _hc2) : hc1(_hc1_), hc2(_hc2),      ext1(1) { }
+        CC1PollResponse(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1_), hc2(_hc2),      ext1(1) { }
         const uint8_t hc1, hc2;
-
+        const uint8_t rh;
+        const uint8_t tp;
+        const uint16_t tr;
+        const bool w;
+        const uint8_t s;
         const uint8_t ext1;
         };
 
