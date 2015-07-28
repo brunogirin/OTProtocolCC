@@ -67,13 +67,14 @@ namespace OTProtocolCC
 
     // CC1Alert contains:
     //   * House code (hc1, hc2) of valve controller that the alert is being sent from (or on behalf of).
-    //   * Two extension bytes, currently reserved and of value 0.
+    //   * Two extension bytes, currently reserved and of value 1.
     // Should generally be fixed length on the wire, and protected by non-zero version of CRC7_5V.
-    //     '!' 4 hc2 hc2 0 0 crc
+    //     '!' 4 hc2 hc2 1 1 crc
+    // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
     // This representation is immutable.
     struct CC1Alert
         {
-        CC1Alert(uint8_t _hc1, _hc2) : hc1(_hc1_), hc2(_hc2), ext1(0), ext2(0) { }
+        CC1Alert(uint8_t _hc1, _hc2) : hc1(_hc1_), hc2(_hc2), ext1(1), ext2(1) { }
         const uint8_t hc1, hc2,
         const uint8_t ext1, ext2;
         };
@@ -83,13 +84,14 @@ namespace OTProtocolCC
     //   * rad-open-percent     [0,100] 0-100 in 1% steps, percent open approx to set rad valve (ro)
     //   * light-colour         [0,3] bit flags 1 is red 2 is green (lc)
     //   * light-on-time        [0,15] 0-30s in units of 2s (lt)
-    //   * Two extension bytes, currently reserved and of value 0.
+    //   * Two extension bytes, currently reserved and of value 1.
     // Should generally be fixed length on the wire, and protected by non-zero version of CRC7_5V.
-    //     '?' 6 hc2 hc2 ro lclt 0 0 crc
+    //     '?' 6 hc2 hc2 ro lclt 1 1 crc
+    // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
     // This representation is immutable.
     struct CC1PollAndCommand
         {
-        CC1PollAndCommand(uint8_t _hc1, _hc2) : hc1(_hc1_), hc2(_hc2), ext1(0), ext2(0) { }
+        CC1PollAndCommand(uint8_t _hc1, _hc2) : hc1(_hc1_), hc2(_hc2),      ext1(1), ext2(1) { }
         const uint8_t hc1, hc2,
         const uint8_t ext1, ext2;
         };
@@ -102,16 +104,18 @@ namespace OTProtocolCC
     //   * temperature-opentrv  [0,1599] 0.000-99.999C in 1/16 C steps, room temp (tr)
     //   * window               [false,true] false=closed,true=open (w)
     //   * switch               [0,7] activation count, wrapround, helps async poll detect activation (s)
-    //   * One extension byte, currently reserved and of value 0.
+    //   * One extension byte, currently reserved and of value 1.
     // Should generally be fixed length on the wire, and protected by non-zero version of CRC7_5V.
-    //     '*' 7 hc2 hc2 rh tp tr1 tr2ws 0 crc
+    //     '*' 7 hc2 hc2 rh tp tr1 tr2ws 1 crc
     // Note that tr1 is top 8 bits of tr (eg in 1/2C).
     // Note that tr2wd is bottom 3 bits of tr (eg in 1/16C) + w + 3 s bits
+    // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
     // This representation is immutable.
     struct CC1PollResponse
         {
-        CC1PollResponse(uint8_t _hc1, _hc2) : hc1(_hc1_), hc2(_hc2) { }
-        const uint8_t hc1, hc2,
+        CC1PollResponse(uint8_t _hc1, _hc2) : hc1(_hc1_), hc2(_hc2),      ext1(1) { }
+        const uint8_t hc1, hc2;
+        const uint8_t ext1;
         };
 
     }
