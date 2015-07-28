@@ -30,6 +30,23 @@ Author(s) / Copyright (s): Damon Hart-Davis 2015
 // Use namespaces to help avoid collisions.
 namespace OTProtocolCC
     {
+    // From OTRadioLink:
+    //namespace OTRadioLink
+    //    {
+    //    // For V0p2 messages on an FS20 carrier (868.35MHz, OOK, 5kbps raw)
+    //    // the leading byte received indicates the frame type that follows.
+    //    enum FrameType_V0p2_FS20
+    //        {
+    //...
+    //        // Messages for minimal central-control V1 (eg REV9 variant).
+    //        FTp2_CC1Alert                = '!', // 0x21
+    //        FTp2_CC1PollAndCmd           = '?', // 0x3f
+    //        FTp2_CC1PollResponse         = '*', // 0x2a
+    //...
+    //        }
+    //     }
+
+
 
     }
 
