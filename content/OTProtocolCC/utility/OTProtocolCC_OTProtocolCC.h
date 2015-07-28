@@ -66,7 +66,7 @@ namespace OTProtocolCC
 
 
     // CC1Alert contains:
-    //   * House code (hc1, hc2) of device alert is being sent from (or on behalf of).
+    //   * House code (hc1, hc2) of valve controller that the alert is being sent from (or on behalf of).
     //   * Two extension bytes, currently reserved and of value 0.
     // Should generally be fixed length on the wire, and protected by non-zero version of CRC7_5V.
     //     '!' 4 hc2 hc2 0 0 crc
@@ -76,6 +76,31 @@ namespace OTProtocolCC
         CC1Alert(uint8_t _hc1, _hc2) : hc1(_hc1_), hc2(_hc2), ext1(0), ext2(0) { }
         const uint8_t hc1, hc2,
         const uint8_t ext1, ext2;
+        };
+
+    // CC1PollAndCommand contains:
+    //   * House code (hc1, hc2) of valve controller that the poll/command is being sent to.
+    //   * ... magic ...
+    // Should generally be fixed length on the wire, and protected by non-zero version of CRC7_5V.
+    //     '?' len hc2 hc2 magic* crc
+    // This representation is immutable.
+    struct CC1PollAndCommand
+        {
+        CC1PollAndCommand(uint8_t _hc1, _hc2) : hc1(_hc1_), hc2(_hc2) { }
+        const uint8_t hc1, hc2,
+        };
+    }
+
+    // CC1PollResponse contains:
+    //   * House code (hc1, hc2) of valve controller that the poll/command is being sent to.
+    //   * ... magic ...
+    // Should generally be fixed length on the wire, and protected by non-zero version of CRC7_5V.
+    //     '*' len hc2 hc2 magic* crc
+    // This representation is immutable.
+    struct CC1PollResponse
+        {
+        CC1PollResponse(uint8_t _hc1, _hc2) : hc1(_hc1_), hc2(_hc2) { }
+        const uint8_t hc1, hc2,
         };
     }
 
