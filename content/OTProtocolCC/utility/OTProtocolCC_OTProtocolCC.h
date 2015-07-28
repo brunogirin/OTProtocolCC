@@ -64,6 +64,7 @@ namespace OTProtocolCC
     // see: http://users.ece.cmu.edu/~koopman/crc/0x5b.txt
     // For 2 or 3 byte payloads this should have a Hamming distance of 4 and be within a factor of 2 of optimal error detection.
 
+
     // CC1Alert contains:
     //   * House code (hc1, hc2) of device alert is being sent from (or on behalf of).
     //   * Two extension bytes, currently reserved and of value 0.
