@@ -89,6 +89,7 @@ namespace OTProtocolCC
     //     '?' 6 hc2 hc2 rp lclt 1 1 crc
     // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
     // This representation is immutable.
+// *** Unresolved note from spreadsheet: colour 0-3 where 0 is off: steady off =0; single flash = 1; double flash = 2; steady on = 3: repeat (flash mode) every n seconds, where 30 <= n <= 600; e.g. 1-1-30 = colour 1, single flash, every 30s
     struct CC1PollAndCommand
         {
         CC1PollAndCommand(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1_), hc2(_hc2),      ext1(1), ext2(1) { }
