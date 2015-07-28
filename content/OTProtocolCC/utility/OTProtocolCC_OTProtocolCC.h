@@ -65,7 +65,6 @@ namespace OTProtocolCC
     // For 2 or 3 byte payloads this should have a Hamming distance of 4 and be within a factor of 2 of optimal error detection.
 
 
-
     }
 
 
