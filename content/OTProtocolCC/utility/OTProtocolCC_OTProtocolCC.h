@@ -102,6 +102,7 @@ namespace OTProtocolCC
         CC1PollResponse(uint8_t _hc1, _hc2) : hc1(_hc1_), hc2(_hc2) { }
         const uint8_t hc1, hc2,
         };
+
     }
 
 
