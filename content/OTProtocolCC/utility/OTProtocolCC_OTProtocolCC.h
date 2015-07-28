@@ -77,6 +77,7 @@ namespace OTProtocolCC
         const uint8_t hc1, hc2,
         const uint8_t ext1, ext2;
         };
+
     }
 
 
