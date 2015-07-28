@@ -64,7 +64,17 @@ namespace OTProtocolCC
     // see: http://users.ece.cmu.edu/~koopman/crc/0x5b.txt
     // For 2 or 3 byte payloads this should have a Hamming distance of 4 and be within a factor of 2 of optimal error detection.
 
-
+    // CC1Alert contains:
+    //   * House code (hc1, hc2) of device alert is being sent from (or on behalf of).
+    //   * Two extension bytes, currently reserved and of value 0.
+    // Should generally be fixed length on the wire, and protected by non-zero version of CRC7_5V.
+    // This representation is immutable.
+    struct CC1Alert
+        {
+        CC1Alert(uint8_t _hc1, _hc2) : hc1(_hc1_), hc2(_hc2), ext1(0), ext2(0) { }
+        const uint8_t hc1, hc2,
+        const uint8_t ext1, ext2;
+        };
     }
 
 
