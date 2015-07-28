@@ -93,9 +93,9 @@ namespace OTProtocolCC
         {
         CC1PollAndCommand(uint8_t _hc1, _hc2) : hc1(_hc1_), hc2(_hc2),      ext1(1), ext2(1) { }
         const uint8_t hc1, hc2,
+
         const uint8_t ext1, ext2;
         };
-    }
 
     // CC1PollResponse contains:
     //   * House code (hc1, hc2) of valve controller that the poll/command is being sent to.
@@ -115,6 +115,7 @@ namespace OTProtocolCC
         {
         CC1PollResponse(uint8_t _hc1, _hc2) : hc1(_hc1_), hc2(_hc2),      ext1(1) { }
         const uint8_t hc1, hc2;
+
         const uint8_t ext1;
         };
 
