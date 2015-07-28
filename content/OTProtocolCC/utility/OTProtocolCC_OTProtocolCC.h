@@ -82,13 +82,15 @@ namespace OTProtocolCC
     // CC1PollAndCommand contains:
     //   * House code (hc1, hc2) of valve controller that the poll/command is being sent to.
     //   * rad-open-percent     [0,100] 0-100 in 1% steps, percent open approx to set rad valve (rp)
-    //   * light-colour         [0,3] bit flags 1 is red 2 is green (lc)
-    //   * light-on-time        [0,15] 0-30s in units of 2s (lt)
+    //   * light-colour         [0,3] bit flags 1==red 2==green (lc) 0 => stop everything
+    //   * light-on-time        [1,15] 2-30s in units of 2s (lt)
+    //   * light-flash          [1,3] 1==single 2==double 3==on (lf)
     //   * Two extension bytes, currently reserved and of value 1.
     // Should generally be fixed length on the wire, and protected by non-zero version of CRC7_5B.
     //     '?' 6 hc2 hc2 rp lclt 1 1 crc
     // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
     // This representation is immutable.
+// *** Unresolved note from spreadsheet: colour 0-3 where 0 is off: steady off =0; single flash = 1; double flash = 2; steady on = 3: repeat (flash mode) every n seconds, where 30 <= n <= 600; e.g. 1-1-30 = colour 1, single flash, every 30s
     struct CC1PollAndCommand
         {
         CC1PollAndCommand(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1_), hc2(_hc2),      ext1(1), ext2(1) { }
@@ -96,6 +98,7 @@ namespace OTProtocolCC
         const uint8_t rp;
         const uint8_t lc;
         const uint8_t lt;
+        const uint8_t lf;
         const uint8_t ext1, ext2;
         };
 
