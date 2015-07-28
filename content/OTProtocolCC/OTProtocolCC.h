@@ -22,6 +22,7 @@ Author(s) / Copyright (s): Damon Hart-Davis 2015
 #define ARDUINO_LIB_OTPROTOCOLCC_VERSION_MAJOR 0
 #define ARDUINO_LIB_OTPROTOCOLCC_VERSION_MINOR 1
 
+/* OpenTRV OTProtocolCC minimal Central Control protocol support library. */
 
 // Core support.
 #include "utility/OTProtocolCC_OTProtocolCC.h"

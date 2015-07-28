@@ -96,9 +96,9 @@ static void testLibVersions()
 #if !(0 == ARDUINO_LIB_OTRADIOLINK_VERSION_MAJOR) || !(5 <= ARDUINO_LIB_OTRADIOLINK_VERSION_MINOR)
 #error Wrong OTRadioLink library version!
 #endif
-#if !(0 == ARDUINO_LIB_OTRFM23BLINK_VERSION_MAJOR) || !(5 <= ARDUINO_LIB_OTRFM23BLINK_VERSION_MINOR)
-#error Wrong OTRFMBLink library version!
-#endif
+//#if !(0 == ARDUINO_LIB_OTRFM23BLINK_VERSION_MAJOR) || !(5 <= ARDUINO_LIB_OTRFM23BLINK_VERSION_MINOR)
+//#error Wrong OTRFMBLink library version!
+//#endif
   }
 
 // Do some basic testing.

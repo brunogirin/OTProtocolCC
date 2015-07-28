@@ -16,7 +16,7 @@ under the Licence.
 Author(s) / Copyright (s): Damon Hart-Davis 2015
 */
 
-#include "OTRadioLink_OTRadioLink.h"
+#include "OTProtocolCC_OTProtocolCC.h"
 
 
 // Use namespaces to help avoid collisions.

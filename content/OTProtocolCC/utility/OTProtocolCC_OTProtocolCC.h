@@ -17,7 +17,7 @@ Author(s) / Copyright (s): Damon Hart-Davis 2015
 */
 
 /*
- * OpenTRV Radio Link base class.
+ * OpenTRV OTProtocolCC minimal Central Control protocol support library.
  */
 
 #ifndef ARDUINO_LIB_OTPROTOCOLCC_OTPROTOCOLCC_H
