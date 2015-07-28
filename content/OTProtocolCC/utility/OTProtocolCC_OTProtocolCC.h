@@ -80,16 +80,16 @@ namespace OTProtocolCC
 
     // CC1PollAndCommand contains:
     //   * House code (hc1, hc2) of valve controller that the poll/command is being sent to.
-    //   * ... magic ...
-    //   * relative-humidity    [0,100] 0-100 in 1% steps
+    //   * rad-open-percent     [0,100] 0-100 in 1% steps, percent open approx to set rad valve (ro)
+    //   * relative-humidity    [0,100] 0-100 in 1% steps (rh)
     //   * temperature-ds18b20  [0,199] 0.000-99.999C in 1/2 C steps, pipe temp (tp)
     //   * temperature-opentrv  [0,1599] 0.000-99.999C in 1/16 C steps, room temp (tr)
-    //   * window               [false,true] false=closed,true=open
-    //   * switch               [0,7] activation count, wrapround, helps async poll detect activation
+    //   * window               [false,true] false=closed,true=open (w)
+    //   * switch               [0,7] activation count, wrapround, helps async poll detect activation (s)
     //   * Two extension bytes, currently reserved and of value 0.
     //
     // Should generally be fixed length on the wire, and protected by non-zero version of CRC7_5V.
-    //     '?' 8 hc2 hc2 rh tp tr1 to2ws 0 0 crc
+    //     '?' 9 hc2 hc2 ro rh tp tr1 to2ws 0 0 crc
     // This representation is immutable.
     struct CC1PollAndCommand
         {
