@@ -113,10 +113,12 @@ namespace OTProtocolCC
     //   * relative-humidity    [0,50] 0-100 in 2% steps (rh)
     //   * temperature-ds18b20  [0,199] 0.000-99.999C in 1/2 C steps, pipe temp (tp)
     //   * temperature-opentrv  [0,199] 0.000-49.999C in 1/4 C steps, room temp (tr)
-    //   * window               [false,true] false=closed,true=open (w)
+    //   * ambient-light        [1,62] no units, dark to light (l)
     //   * switch               [false,true] activation toggle, helps async poll detect intermittent use (s)
+    //   * window               [false,true] false=closed,true=open (w)
+    //   * syncing              [false,true] if true, (re)syncing to FHT8V (sy)
     // Should generally be fixed length on the wire, and protected by non-zero version of CRC7_5B.
-    //     '*' hc2 hc2 w|s|rh tp tr 1 crc
+    //     '*' hc2 hc2 w|s|rh tp tr sy|al|1 crc
     // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
     // This representation is immutable.
     struct CC1PollResponse
@@ -126,8 +128,10 @@ namespace OTProtocolCC
         const uint8_t rh;
         const uint8_t tp;
         const uint16_t tr;
+        const uint8_t aml:6;
         const bool w;
         const bool s;
+        const boot sy;
         // Length including leading type, but excluding trailing CRC (to allow other encapsulation).
         // The CRC7_5B is most effective at no more than 7 bytes.
         static const int primary_frame_bytes = 7;
