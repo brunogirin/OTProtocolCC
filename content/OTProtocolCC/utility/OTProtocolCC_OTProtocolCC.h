@@ -66,7 +66,7 @@ namespace OTProtocolCC
 
     // CC1Base
     // Base class for common operations.
-    // NO virtual destructor, so don't delete from base class.
+    // NO virtual destructor, so don't delete from point to any base class.
     class CC1Base
         {
         public:
