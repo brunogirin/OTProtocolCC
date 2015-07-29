@@ -53,7 +53,7 @@ namespace OTProtocolCC
     //
     //  a) The first byte is one of '!', '?' or '*' to indicate the message type for the initial forms.
     //  b) (The first byte will later be one of '!', '?' or '*' ORed with '0x80' to indicate a secure message variant.)
-    //  c) The second byte is a length byte (nn) of the rest of the frame excluding CRC.
+    // c) Length is implicit and always 7 bytes excluding the CRC.
     //  d) nn bytes of data follow, of which the first two bytes will be the house code.
     //  e) The 7-bit CRC follows, arranged to never be 0x00 or 0xff.
     //  f) For the secure forms the message type and length and the house code will be part of the authenticated data.
@@ -67,19 +67,19 @@ namespace OTProtocolCC
 
     // CC1Alert contains:
     //   * House code (hc1, hc2) of valve controller that the alert is being sent from (or on behalf of).
-    //   * Two extension bytes, currently reserved and of value 1.
+    //   * Four extension bytes, currently reserved and of value 1.
     // Should generally be fixed length on the wire, and protected by non-zero version of CRC7_5B.
-    //     '!' 4 hc2 hc2 1 1 crc
+    //     '!' hc2 hc2 1 1 1 1 crc
     // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
     // This representation is immutable.
     struct CC1Alert
         {
-        CC1Alert(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1), hc2(_hc2), ext1(1), ext2(1) { }
+        CC1Alert(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1), hc2(_hc2) { }
         const uint8_t hc1, hc2,
-        const uint8_t ext1, ext2;
+//        const uint8_t ext1, ext2, ext3, ext4;
         // Length including leading type, but excluding trailing CRC (to allow other encapsulation).
         // The CRC7_5B is most effective at no more than 7 bytes.
-        static const int primary_frame_bytes = 6;
+        static const int primary_frame_bytes = 7;
         };
 
     // CC1PollAndCommand contains:
@@ -88,21 +88,21 @@ namespace OTProtocolCC
     //   * light-colour         [0,3] bit flags 1==red 2==green (lc) 0 => stop everything
     //   * light-on-time        [1,15] (0 not allowed) 2-30s in units of 2s (lt)
     //   * light-flash          [1,3] (0 not allowed) 1==single 2==double 3==on (lf)
-    //   * One extension byte, currently reserved and of value 1.
+    //   * Two extension bytes, currently reserved and of value 1.
     // Should generally be fixed length on the wire, and protected by non-zero version of CRC7_5B.
-    //     '?' 6 hc2 hc2 rp lclt 1 crc
+    //     '?' hc2 hc2 rp lf|lt|lc 1 1 crc
     // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
     // This representation is immutable.
 // *** Unresolved note from spreadsheet: colour 0-3 where 0 is off: steady off =0; single flash = 1; double flash = 2; steady on = 3: repeat (flash mode) every n seconds, where 30 <= n <= 600; e.g. 1-1-30 = colour 1, single flash, every 30s
     struct CC1PollAndCommand
         {
-        CC1PollAndCommand(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1_), hc2(_hc2),      ext1(1) { }
+        CC1PollAndCommand(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1_), hc2(_hc2) { }
         const uint8_t hc1, hc2,
         const uint8_t rp:7;
         const uint8_t lc:2;
         const uint8_t lt:4;
         const uint8_t lf:2;
-        const uint8_t ext1;
+//        const uint8_t ext1, ext2;
         // Length including leading type, but excluding trailing CRC (to allow other encapsulation).
         // The CRC7_5B is most effective at no more than 7 bytes.
         static const int primary_frame_bytes = 7;
@@ -110,29 +110,27 @@ namespace OTProtocolCC
 
     // CC1PollResponse contains:
     //   * House code (hc1, hc2) of valve controller that the poll/command is being sent to.
-    //   * relative-humidity    [0,100] 0-100 in 1% steps (rh)
+    //   * relative-humidity    [0,50] 0-100 in 2% steps (rh)
     //   * temperature-ds18b20  [0,199] 0.000-99.999C in 1/2 C steps, pipe temp (tp)
-    //   * temperature-opentrv  [0,1599] 0.000-99.999C in 1/16 C steps, room temp (tr)
+    //   * temperature-opentrv  [0,199] 0.000-49.999C in 1/4 C steps, room temp (tr)
     //   * window               [false,true] false=closed,true=open (w)
-    //   * switch               [0,7] activation count, wrapround, helps async poll detect activation (s)
+    //   * switch               [false,true] activation toggle, helps async poll detect intermittent use (s)
     // Should generally be fixed length on the wire, and protected by non-zero version of CRC7_5B.
-    //     '*' 6 hc2 hc2 w|rh tp tr1 s|tr2 crc
-    // Note that tr1 is top 8 bits of tr (eg in 1/2C).
-    // Note that tr2 is bottom 3 bits of tr (eg in 1/16C)
+    //     '*' hc2 hc2 w|s|rh tp tr 1 crc
     // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
     // This representation is immutable.
     struct CC1PollResponse
         {
         CC1PollResponse(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1_), hc2(_hc2)      { }
         const uint8_t hc1, hc2;
-        const uint8_t rh:7;
+        const uint8_t rh;
         const uint8_t tp;
-        const uint16_t tr:11;
+        const uint16_t tr;
         const bool w;
-        const uint8_t :3s;
+        const bool s;
         // Length including leading type, but excluding trailing CRC (to allow other encapsulation).
         // The CRC7_5B is most effective at no more than 7 bytes.
-        static const int primary_frame_bytes = 8;
+        static const int primary_frame_bytes = 7;
         };
 
     }
