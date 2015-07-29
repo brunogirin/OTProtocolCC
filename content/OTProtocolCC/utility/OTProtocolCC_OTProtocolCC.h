@@ -64,6 +64,22 @@ namespace OTProtocolCC
     // see: http://users.ece.cmu.edu/~koopman/crc/0x5b.txt
     // For 2 or 3 byte payloads this should have a Hamming distance of 4 and be within a factor of 2 of optimal error detection.
 
+    // CC1Base
+    // Base class for common operations.
+    // NO virtual destructor, so don't delete from base class.
+    class CC1Base
+        {
+        public:
+            // Encode in simple form (no auth/enc).
+            // Returns number of bytes written if successful, 0 if not.
+            //   * includeCRC  if true then append the CRC.
+            uint8_t encodeSimple(uint8_t *buf, uint8_t buflen, bool includeCRC) = 0;
+
+            // Decode from simple form (no auth/enc).
+            // Returns number of bytes read if successful, 0 if not.
+            //   * includeCRC  if true then check the CRC.
+            unit8_t decodeSimple(const uint8_t *buf, uint8_t buflen, bool includeCRC) = 0;
+        };
 
     // CC1Alert contains:
     //   * House code (hc1, hc2) of valve controller that the alert is being sent from (or on behalf of).
@@ -72,7 +88,7 @@ namespace OTProtocolCC
     //     '!' hc2 hc2 1 1 1 1 crc
     // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
     // This representation is immutable.
-    struct CC1Alert
+    struct CC1Alert : public CC1Base
         {
         CC1Alert(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1), hc2(_hc2) { }
         const uint8_t hc1, hc2,
@@ -94,7 +110,7 @@ namespace OTProtocolCC
     // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
     // This representation is immutable.
 // *** Unresolved note from spreadsheet: colour 0-3 where 0 is off: steady off =0; single flash = 1; double flash = 2; steady on = 3: repeat (flash mode) every n seconds, where 30 <= n <= 600; e.g. 1-1-30 = colour 1, single flash, every 30s
-    struct CC1PollAndCommand
+    struct CC1PollAndCommand : public CC1Base
         {
         CC1PollAndCommand(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1_), hc2(_hc2) { }
         const uint8_t hc1, hc2,
@@ -121,7 +137,7 @@ namespace OTProtocolCC
     //     '*' hc2 hc2 w|s|rh tp tr sy|al|1 crc
     // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
     // This representation is immutable.
-    struct CC1PollResponse
+    struct CC1PollResponse : public CC1Base
         {
         CC1PollResponse(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1_), hc2(_hc2)      { }
         const uint8_t hc1, hc2;
