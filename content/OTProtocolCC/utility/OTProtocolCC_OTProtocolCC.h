@@ -87,6 +87,7 @@ namespace OTProtocolCC
     // Should generally be fixed length on the wire, and protected by non-zero version of CRC7_5B.
     //     '!' hc2 hc2 1 1 1 1 crc
     // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
+    // Protocol note: sent asynchronously by the relay, though not generally at most once every 30s.
     // This representation is immutable.
     struct CC1Alert : public CC1Base
         {
@@ -111,6 +112,8 @@ namespace OTProtocolCC
     // Should generally be fixed length on the wire, and protected by non-zero version of CRC7_5B.
     //     '?' hc2 hc2 rp lf|lt|lc 1 1 crc
     // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
+    // Protocol note: sent asynchronously by the hub to the relay, at least every 15m, generally no more than once per 30s.
+    // Protocol note: after ~30m without hearing one of these from its hub a relay may go into fallback mode.
     // This representation is immutable.
 // *** Unresolved note from spreadsheet: colour 0-3 where 0 is off: steady off =0; single flash = 1; double flash = 2; steady on = 3: repeat (flash mode) every n seconds, where 30 <= n <= 600; e.g. 1-1-30 = colour 1, single flash, every 30s
     struct CC1PollAndCommand : public CC1Base
@@ -142,6 +145,7 @@ namespace OTProtocolCC
     // Should generally be fixed length on the wire, and protected by non-zero version of CRC7_5B.
     //     '*' hc2 hc2 w|s|rh tp tr sy|al|1 crc
     // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
+    // Protocol note: sent synchronously by the relay, within 10s of a poll/cmd from its hub.
     // This representation is immutable.
     struct CC1PollResponse : public CC1Base
         {
