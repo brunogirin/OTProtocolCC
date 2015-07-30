@@ -106,7 +106,7 @@ namespace OTProtocolCC
     //   * House code (hc1, hc2) of valve controller that the poll/command is being sent to.
     //   * rad-open-percent     [0,100] 0-100 in 1% steps, percent open approx to set rad valve (rp)
     //   * light-colour         [0,3] bit flags 1==red 2==green (lc) 0 => stop everything
-    //   * light-on-time        [1,15] (0 not allowed) 2-30s in units of 2s (lt)
+    //   * light-on-time        [1,15] (0 not allowed) 30-450s in units of 30s (lt) ???
     //   * light-flash          [1,3] (0 not allowed) 1==single 2==double 3==on (lf)
     //   * Two extension bytes, currently reserved and of value 1.
     // Should generally be fixed length on the wire, and protected by non-zero version of CRC7_5B.
@@ -115,7 +115,6 @@ namespace OTProtocolCC
     // Protocol note: sent asynchronously by the hub to the relay, at least every 15m, generally no more than once per 30s.
     // Protocol note: after ~30m without hearing one of these from its hub a relay may go into fallback mode.
     // This representation is immutable.
-// *** Unresolved note from spreadsheet: colour 0-3 where 0 is off: steady off =0; single flash = 1; double flash = 2; steady on = 3: repeat (flash mode) every n seconds, where 30 <= n <= 600; e.g. 1-1-30 = colour 1, single flash, every 30s
     struct CC1PollAndCommand : public CC1Base
         {
         CC1PollAndCommand(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1_), hc2(_hc2) { }
