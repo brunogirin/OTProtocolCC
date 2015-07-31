@@ -18,11 +18,36 @@ Author(s) / Copyright (s): Damon Hart-Davis 2015
 
 #include "OTProtocolCC_OTProtocolCC.h"
 
+#include <OTRadioLink.h>
 
 // Use namespaces to help avoid collisions.
 namespace OTProtocolCC
     {
 
+// Compute the (non-zero) CRC for simple messages, for encode or decode.
+// Nominally looks at the message type to decide who many bytes to apply the CRC to.
+// The result should match the actual CRC on decode,
+// and can be used to set the CRC from on encode.
+// Returns 0 (invalid) if the buffer is too short or the message otherwise invalid.
+uint8_t CC1Base::computeSimpleCRC(const uint8_t *buf, uint8_t buflen)
+    {
+    // Assume a fixed message length.
+    const uint8_t len = 7;
+
+    if(buflen < len) { return(0); } // FAIL
+
+    // Start with first (type) byte, which should always be non-zero.
+    // NOTE: this does not start with a separate (eg -1) value, nor invert the result, to save time for these fixed length messages.
+    uint8_t crc = buf[0];
+    if(0 == crc) { return(0); } // FAIL.
+
+    for(uint8_t i = 1; i < len; ++i)
+        { crc = OTRadioLink::crc7_5B_update(crc, buf[i]); }
+
+    // Replace a zero CRC value with a non-zero.
+    if(0 != crc) { return(crc); }
+    return(OTRadioLink::crc7_5B_update_nz_ALT);
+    }
 
 
 

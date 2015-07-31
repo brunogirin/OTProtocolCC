@@ -78,7 +78,14 @@ namespace OTProtocolCC
             // Decode from simple form (no auth/enc).
             // Returns number of bytes read if successful, 0 if not.
             //   * includeCRC  if true then check the CRC.
-            virtual unit8_t decodeSimple(const uint8_t *buf, uint8_t buflen, bool includeCRC) = 0;
+            virtual uint8_t decodeSimple(const uint8_t *buf, uint8_t buflen, bool includeCRC) = 0;
+
+            // Compute the (non-zero) CRC for simple messages, for encode or decode.
+            // Nominally looks at the message type to decide who many bytes to apply the CRC to.
+            // The result should match the actual CRC on decode,
+            // and can be used to set the CRC from on encode.
+            // Returns 0 (invalid) if the buffer is too short or the message otherwise invalid.
+            uint8_t computeSimpleCRC(const uint8_t *buf, uint8_t buflen);
         };
 
     // CC1Alert contains:
@@ -92,14 +99,14 @@ namespace OTProtocolCC
     struct CC1Alert : public CC1Base
         {
         CC1Alert(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1), hc2(_hc2) { }
-        const uint8_t hc1, hc2,
+        const uint8_t hc1, hc2;
 //        const uint8_t ext1, ext2, ext3, ext4;
         // Length including leading type, but excluding trailing CRC (to allow other encapsulation).
         // The CRC7_5B is most effective at no more than 7 bytes.
         static const int primary_frame_bytes = 7;
         // Encode/decode.
         virtual uint8_t encodeSimple(uint8_t *buf, uint8_t buflen, bool includeCRC);
-        virtual unit8_t decodeSimple(const uint8_t *buf, uint8_t buflen, bool includeCRC);
+        virtual uint8_t decodeSimple(const uint8_t *buf, uint8_t buflen, bool includeCRC);
         };
 
     // CC1PollAndCommand contains:
@@ -117,19 +124,19 @@ namespace OTProtocolCC
     // This representation is immutable.
     struct CC1PollAndCommand : public CC1Base
         {
-        CC1PollAndCommand(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1_), hc2(_hc2) { }
-        const uint8_t hc1, hc2,
-        const uint8_t rp:7;
-        const uint8_t lc:2;
-        const uint8_t lt:4;
-        const uint8_t lf:2;
+        CC1PollAndCommand(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1), hc2(_hc2) { }
+        const uint8_t hc1, hc2;
+//        const uint8_t rp:7;
+//        const uint8_t lc:2;
+//        const uint8_t lt:4;
+//        const uint8_t lf:2;
 //        const uint8_t ext1, ext2;
         // Length including leading type, but excluding trailing CRC (to allow other encapsulation).
         // The CRC7_5B is most effective at no more than 7 bytes.
         static const int primary_frame_bytes = 7;
         // Encode/decode.
         virtual uint8_t encodeSimple(uint8_t *buf, uint8_t buflen, bool includeCRC);
-        virtual unit8_t decodeSimple(const uint8_t *buf, uint8_t buflen, bool includeCRC);
+        virtual uint8_t decodeSimple(const uint8_t *buf, uint8_t buflen, bool includeCRC);
         };
 
     // CC1PollResponse contains:
@@ -142,27 +149,27 @@ namespace OTProtocolCC
     //   * window               [false,true] false=closed,true=open (w)
     //   * syncing              [false,true] if true, (re)syncing to FHT8V (sy)
     // Should generally be fixed length on the wire, and protected by non-zero version of CRC7_5B.
-    //     '*' hc2 hc2 w|s|rh tp tr sy|al|1 crc
+    //     '*' hc2 hc2 w|s|rh tp tr sy|al|0 crc
     // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
     // Protocol note: sent synchronously by the relay, within 10s of a poll/cmd from its hub.
     // This representation is immutable.
     struct CC1PollResponse : public CC1Base
         {
-        CC1PollResponse(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1_), hc2(_hc2)      { }
+        CC1PollResponse(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1), hc2(_hc2)      { }
         const uint8_t hc1, hc2;
-        const uint8_t rh;
-        const uint8_t tp;
-        const uint16_t tr;
-        const uint8_t aml:6;
-        const bool w;
-        const bool s;
-        const boot sy;
+//        const uint8_t rh;
+//        const uint8_t tp;
+//        const uint16_t tr;
+//        const uint8_t aml:6;
+//        const bool w;
+//        const bool s;
+//        const boot sy;
         // Length including leading type, but excluding trailing CRC (to allow other encapsulation).
         // The CRC7_5B is most effective at no more than 7 bytes.
         static const int primary_frame_bytes = 7;
         // Encode/decode.
         virtual uint8_t encodeSimple(uint8_t *buf, uint8_t buflen, bool includeCRC);
-        virtual unit8_t decodeSimple(const uint8_t *buf, uint8_t buflen, bool includeCRC);
+        virtual uint8_t decodeSimple(const uint8_t *buf, uint8_t buflen, bool includeCRC);
         };
 
     }
