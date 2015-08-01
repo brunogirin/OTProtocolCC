@@ -143,7 +143,7 @@ void loop()
   // Allow the terminal console to be brought up.
   for(int i = 3; i > 0; --i)
     {
-    Serial.print(F("Tests starting... "));
+    Serial.print(F("Tests (compiled "__TIME__") starting... " ));
     Serial.print(i);
     Serial.println();
     delay(1000);
