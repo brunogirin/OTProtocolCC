@@ -118,8 +118,8 @@ static void testCommonCRC()
   AssertIsEqual(0, OTProtocolCC::CC1Base::computeSimpleCRC(buf, 6));
   AssertIsTrue(0 != OTProtocolCC::CC1Base::computeSimpleCRC(buf, OTProtocolCC::CC1Alert::primary_frame_bytes)); // Should be long enough.
   }
-  
-  
+
+
 
 
 
