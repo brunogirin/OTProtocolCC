@@ -66,12 +66,31 @@ uint8_t CC1Alert::encodeSimple(uint8_t *const buf, const uint8_t buflen, const b
     return(true);
     }
 
-// Decode from simple form (no auth/enc) from the uint8_t array.
-// Returns number of bytes read if successful, 0 if not.
-uint8_t CC1Alert::decodeSimple(const uint8_t *const buf, const uint8_t buflen, const bool includeCRC)
+// Factory method to decode an instance from the wire, including CRC.
+// Invalid parameters (eg 0xff house codes) will be rejected.
+// Returns instance; check isValid().
+CC1Alert CC1Alert::decodeAlert(const uint8_t *const buf, const uint8_t buflen)
     {
-    return(0); // FIXME: fail
+    CC1Alert r; // Invalid by default.
+    // Validate args.
+    if(!decodeSimpleArgsSane(buf, buflen, true)) { return(r); } // FAIL: return invalid item.
+    // Check frame type.
+    if('!' != buf[0]) { return(r); } // FAIL: return invalid item.
+    // Check CRC.
+    if(computeSimpleCRC(buf, buflen) != buf[7]) { return(r); } // FAIL: return invalid item.
+    // Extract house code.
+    r.hc1 = buf[1];
+    r.hc2 = buf[2];
+    // Instance will be valid if house code is.
+    return(r);
     }
+
+//// Decode from simple form (no auth/enc) from the uint8_t array.
+//// Returns number of bytes read if successful, 0 if not.
+//uint8_t CC1Alert::decodeSimple(const uint8_t *const buf, const uint8_t buflen, const bool includeCRC)
+//    {
+//    return(0); // FIXME: fail
+//    }
 
 
 

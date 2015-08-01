@@ -121,10 +121,10 @@ static void testCommonCRC()
   //     '!' hc2 hc2 1 1 1 1 crc
   // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
   // Minimal alert with zero house codes.
-  static uint8_t bufAlert0[] = {'!', 0, 0, 1, 1, 1, 1};
+  uint8_t bufAlert0[] = {'!', 0, 0, 1, 1, 1, 1};
   AssertIsEqual(80, OTProtocolCC::CC1Base::computeSimpleCRC(bufAlert0, sizeof(bufAlert0)));
   // Minimal alert with non-zero house codes.
-  static uint8_t bufAlert1[] = {'!', 10, 21, 1, 1, 1, 1};
+  uint8_t bufAlert1[] = {'!', 10, 21, 1, 1, 1, 1};
   AssertIsEqual(55, OTProtocolCC::CC1Base::computeSimpleCRC(bufAlert1, sizeof(bufAlert1)));
   }
 
@@ -149,6 +149,16 @@ static void testCC1Obj()
   AssertIsEqual(1,   buf[5]);
   AssertIsEqual(1,   buf[6]);
   AssertIsEqual(55,  buf[7]);
+  // Decode alert with non-zero house codes.
+  uint8_t bufAlert0[] = {'!', 99,99, 1, 1, 1, 1, 12};
+  OTProtocolCC::CC1Alert a2;
+  // Bare instance should be invalid by default.
+  AssertIsTrue(!a2.isValid());
+  a2 = OTProtocolCC::CC1Alert::decodeAlert(bufAlert0, sizeof(bufAlert0));
+  // After decode instance should be valid and with correct house code.
+  AssertIsTrue(a2.isValid());
+  AssertIsEqual(99, a2.getHC1());
+  AssertIsEqual(99, a2.getHC2());
   }
 
 
