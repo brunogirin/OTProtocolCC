@@ -69,13 +69,30 @@ namespace OTProtocolCC
     // NO virtual destructor, so don't delete from point to any base class.
     class CC1Base
         {
+        protected:
+            // House code /ID for device.
+            // Normally each byte is in the range [0,99].
+            // Anything other than 0xff can be considered valid.
+            uint8_t hc1, hc2;
+
         public:
-            // Encode in simple form (no auth/enc).
+            // True if the current state of this CC1 instance is valid.
+            // Always false for the base instance.
+            virtual bool isValid() const { return(false); }
+
+            // Get house code 1; any non-0xff value is potentially valid.
+            uint8_t getHC1() { return(hc1); }
+            // Get house code 2; any non-0xff value is potentially valid.
+            uint8_t getHC2() { return(hc2); }
+            // True iff the house code is valid (ie neither byte is 0xff).
+            bool houseCodeIsValid() const { return((0xff != hc1) && (0xff != hc2)); }
+
+            // Encode in simple form to the uint8_t array (no auth/enc).
             // Returns number of bytes written if successful, 0 if not.
             //   * includeCRC  if true then append the CRC.
-            virtual uint8_t encodeSimple(uint8_t *buf, uint8_t buflen, bool includeCRC) = 0;
+            virtual uint8_t encodeSimple(uint8_t *buf, uint8_t buflen, bool includeCRC) const = 0;
 
-            // Decode from simple form (no auth/enc).
+            // Decode from simple form (no auth/enc) from the uint8_t array.
             // Returns number of bytes read if successful, 0 if not.
             //   * includeCRC  if true then check the CRC.
             virtual uint8_t decodeSimple(const uint8_t *buf, uint8_t buflen, bool includeCRC) = 0;
@@ -84,7 +101,8 @@ namespace OTProtocolCC
             // Nominally looks at the message type to decide who many bytes to apply the CRC to.
             // The result should match the actual CRC on decode,
             // and can be used to set the CRC from on encode.
-            // Returns 0 (invalid) if the buffer is too short or the message otherwise invalid.
+            // Returns CRC on success,
+            // else 0 (invalid) if the buffer is too short or the message otherwise invalid.
             static uint8_t computeSimpleCRC(const uint8_t *buf, uint8_t buflen);
         };
 
@@ -95,18 +113,25 @@ namespace OTProtocolCC
     //     '!' hc2 hc2 1 1 1 1 crc
     // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
     // Protocol note: sent asynchronously by the relay, though not generally at most once every 30s.
+    // This message is simple enough that most of the methods can be inline.
     // This representation is immutable.
-    struct CC1Alert : public CC1Base
+    class CC1Alert : public CC1Base
         {
-        CC1Alert(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1), hc2(_hc2) { }
-        const uint8_t hc1, hc2;
-//        const uint8_t ext1, ext2, ext3, ext4;
-        // Length including leading type, but excluding trailing CRC (to allow other encapsulation).
-        // The CRC7_5B is most effective at no more than 7 bytes.
-        static const int primary_frame_bytes = 7;
-        // Encode/decode.
-        virtual uint8_t encodeSimple(uint8_t *buf, uint8_t buflen, bool includeCRC);
-        virtual uint8_t decodeSimple(const uint8_t *buf, uint8_t buflen, bool includeCRC);
+        public:
+            // Length including leading type, but excluding trailing CRC (to allow other encapsulation).
+            // The CRC7_5B is most effective at no more than 7 bytes.
+            static const int primary_frame_bytes = 7;
+            // Factory method to create instance.
+            // Invalid parameters (eg 0xff house codes) will be rejected.
+            // Returns instance; check isValid().
+            static CC1Alert makeAlert(uint8_t hc1, uint8_t hc2) { CC1Alert r; r.hc1=hc1; r.hc2=hc2; return(r); }
+            // True if the current state of this CC1 instance is valid.
+            virtual bool isValid() const { return(houseCodeIsValid()); }
+            // Encode/decode to/from uint8_t buffer.
+            virtual uint8_t encodeSimple(uint8_t *buf, uint8_t buflen, bool includeCRC) const;
+            virtual uint8_t decodeSimple(const uint8_t *buf, uint8_t buflen, bool includeCRC);
+//        private:
+//            CC1Alert(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1), hc2(_hc2) { }
         };
 
     // CC1PollAndCommand contains:
@@ -124,8 +149,8 @@ namespace OTProtocolCC
     // This representation is immutable.
     struct CC1PollAndCommand : public CC1Base
         {
-        CC1PollAndCommand(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1), hc2(_hc2) { }
-        const uint8_t hc1, hc2;
+//        CC1PollAndCommand(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1), hc2(_hc2) { }
+//        const uint8_t hc1, hc2;
 //        const uint8_t rp:7;
 //        const uint8_t lc:2;
 //        const uint8_t lt:4;
@@ -135,7 +160,7 @@ namespace OTProtocolCC
         // The CRC7_5B is most effective at no more than 7 bytes.
         static const int primary_frame_bytes = 7;
         // Encode/decode.
-        virtual uint8_t encodeSimple(uint8_t *buf, uint8_t buflen, bool includeCRC);
+        virtual uint8_t encodeSimple(uint8_t *buf, uint8_t buflen, bool includeCRC) const;
         virtual uint8_t decodeSimple(const uint8_t *buf, uint8_t buflen, bool includeCRC);
         };
 
@@ -155,8 +180,8 @@ namespace OTProtocolCC
     // This representation is immutable.
     struct CC1PollResponse : public CC1Base
         {
-        CC1PollResponse(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1), hc2(_hc2)      { }
-        const uint8_t hc1, hc2;
+//        CC1PollResponse(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1), hc2(_hc2)      { }
+//        const uint8_t hc1, hc2;
 //        const uint8_t rh;
 //        const uint8_t tp;
 //        const uint16_t tr;
@@ -168,7 +193,7 @@ namespace OTProtocolCC
         // The CRC7_5B is most effective at no more than 7 bytes.
         static const int primary_frame_bytes = 7;
         // Encode/decode.
-        virtual uint8_t encodeSimple(uint8_t *buf, uint8_t buflen, bool includeCRC);
+        virtual uint8_t encodeSimple(uint8_t *buf, uint8_t buflen, bool includeCRC) const;
         virtual uint8_t decodeSimple(const uint8_t *buf, uint8_t buflen, bool includeCRC);
         };
 
