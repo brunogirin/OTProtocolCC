@@ -26,6 +26,7 @@ Author(s) / Copyright (s): Damon Hart-Davis 2015
 #include <stddef.h>
 #include <stdint.h>
 
+#include <OTRadioLink.h>
 
 // Use namespaces to help avoid collisions.
 namespace OTProtocolCC
@@ -131,7 +132,8 @@ namespace OTProtocolCC
     // CC1Alert contains:
     //   * House code (hc1, hc2) of valve controller that the alert is being sent from (or on behalf of).
     //   * Four extension bytes, currently reserved and of value 1.
-    // Should generally be fixed length on the wire, and protected by non-zero version of CRC7_5B.
+    // Fixed length on the wire, and protected by non-zero version of CRC7_5B.
+    // Initial frame-type character is OTRadioLink::FTp2_CC1Alert.
     //     '!' hc2 hc2 1 1 1 1 crc
     // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
     // Protocol note: sent asynchronously by the relay, though not generally at most once every 30s.
@@ -140,11 +142,13 @@ namespace OTProtocolCC
     class CC1Alert : public CC1Base
         {
         public:
-            // Create known-invalid instance, quickly.
-            CC1Alert() { }
+            // Frame type (leading byte for simple encodings).
+            static const OTRadioLink::FrameType_V0p2_FS20 frame_type = OTRadioLink::FTp2_CC1Alert;
             // Length including leading type, but excluding trailing CRC (to allow other encapsulation).
             // The CRC7_5B is most effective at no more than 7 bytes.
             static const int primary_frame_bytes = 7;
+            // Create known-invalid instance, quickly.
+            CC1Alert() { }
             // Factory method to create instance.
             // Invalid parameters (eg 0xff house codes) will be rejected.
             // Returns instance; check isValid().
@@ -171,14 +175,22 @@ namespace OTProtocolCC
     //   * light-on-time        [1,15] (0 not allowed) 30-450s in units of 30s (lt) ???
     //   * light-flash          [1,3] (0 not allowed) 1==single 2==double 3==on (lf)
     //   * Two extension bytes, currently reserved and of value 1.
-    // Should generally be fixed length on the wire, and protected by non-zero version of CRC7_5B.
+    // Fixed length on the wire, and protected by non-zero version of CRC7_5B.
+    // Initial frame-type character is OTRadioLink::FTp2_CC1PollAndCmd.
     //     '?' hc2 hc2 rp lf|lt|lc 1 1 crc
     // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
     // Protocol note: sent asynchronously by the hub to the relay, at least every 15m, generally no more than once per 30s.
     // Protocol note: after ~30m without hearing one of these from its hub a relay may go into fallback mode.
     // This representation is immutable.
-    struct CC1PollAndCommand : public CC1Base
+    class CC1PollAndCommand : public CC1Base
         {
+        public:
+            // Frame type (leading byte for simple encodings).
+            static const OTRadioLink::FrameType_V0p2_FS20 frame_type = OTRadioLink::FTp2_CC1PollAndCmd;
+            // Length including leading type, but excluding trailing CRC (to allow other encapsulation).
+            // The CRC7_5B is most effective at no more than 7 bytes.
+            static const int primary_frame_bytes = 7;
+
 //        CC1PollAndCommand(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1), hc2(_hc2) { }
 //        const uint8_t hc1, hc2;
 //        const uint8_t rp:7;
@@ -186,9 +198,7 @@ namespace OTProtocolCC
 //        const uint8_t lt:4;
 //        const uint8_t lf:2;
 //        const uint8_t ext1, ext2;
-        // Length including leading type, but excluding trailing CRC (to allow other encapsulation).
-        // The CRC7_5B is most effective at no more than 7 bytes.
-        static const int primary_frame_bytes = 7;
+
             // Encode to uint8_t buffer.
             virtual uint8_t encodeSimple(uint8_t *buf, uint8_t buflen, bool includeCRC) const;
         protected:
@@ -205,13 +215,21 @@ namespace OTProtocolCC
     //   * switch               [false,true] activation toggle, helps async poll detect intermittent use (s)
     //   * window               [false,true] false=closed,true=open (w)
     //   * syncing              [false,true] if true, (re)syncing to FHT8V (sy)
-    // Should generally be fixed length on the wire, and protected by non-zero version of CRC7_5B.
+    // Fixed length on the wire, and protected by non-zero version of CRC7_5B.
+    // Initial frame-type character is OTRadioLink::FTp2_CC1PollResponse.
     //     '*' hc2 hc2 w|s|rh tp tr sy|al|0 crc
     // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
     // Protocol note: sent synchronously by the relay, within 10s of a poll/cmd from its hub.
     // This representation is immutable.
-    struct CC1PollResponse : public CC1Base
+    class CC1PollResponse : public CC1Base
         {
+        public:
+            // Frame type (leading byte for simple encodings).
+            static const OTRadioLink::FrameType_V0p2_FS20 frame_type = OTRadioLink::FTp2_CC1PollResponse;
+            // Length including leading type, but excluding trailing CRC (to allow other encapsulation).
+            // The CRC7_5B is most effective at no more than 7 bytes.
+            static const int primary_frame_bytes = 7;
+
 //        CC1PollResponse(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1), hc2(_hc2)      { }
 //        const uint8_t hc1, hc2;
 //        const uint8_t rh;
@@ -221,9 +239,7 @@ namespace OTProtocolCC
 //        const bool w;
 //        const bool s;
 //        const boot sy;
-        // Length including leading type, but excluding trailing CRC (to allow other encapsulation).
-        // The CRC7_5B is most effective at no more than 7 bytes.
-        static const int primary_frame_bytes = 7;
+
             // Encode to uint8_t buffer.
             virtual uint8_t encodeSimple(uint8_t *buf, uint8_t buflen, bool includeCRC) const;
         protected:

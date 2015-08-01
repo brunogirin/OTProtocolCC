@@ -141,7 +141,7 @@ static void testCC1Obj()
   // Try encoding a simple alert.
   uint8_t buf[13]; // More than long enough.
   AssertIsTrue(a1.encodeSimple(buf, sizeof(buf), true));
-  AssertIsEqual('!', buf[0]);
+  AssertIsEqual('!', buf[0]); // FTp2_CC1Alert.
   AssertIsEqual(10,  buf[1]);
   AssertIsEqual(21,  buf[2]);
   AssertIsEqual(1,   buf[3]);

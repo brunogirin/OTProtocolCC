@@ -55,7 +55,7 @@ uint8_t CC1Base::computeSimpleCRC(const uint8_t *buf, uint8_t buflen)
 uint8_t CC1Alert::encodeSimple(uint8_t *const buf, const uint8_t buflen, const bool includeCRC) const
     {
     if(!encodeSimpleArgsSane(buf, buflen, includeCRC)) { return(0); } // FAIL.
-    buf[0] = '!';
+    buf[0] = frame_type; // OTRadioLink::FTp2_CC1Alert;
     buf[1] = hc1;
     buf[2] = hc2;
     buf[3] = 1;
@@ -75,7 +75,7 @@ CC1Alert CC1Alert::decodeAlert(const uint8_t *const buf, const uint8_t buflen)
     // Validate args.
     if(!decodeSimpleArgsSane(buf, buflen, true)) { return(r); } // FAIL: return invalid item.
     // Check frame type.
-    if('!' != buf[0]) { return(r); } // FAIL: return invalid item.
+    if(frame_type /* OTRadioLink::FTp2_CC1Alert */ != buf[0]) { return(r); } // FAIL: return invalid item.
     // Explicitly test at least first extension byte is as expected.
     if(1 != buf[3]) { return(r); } // FAIL: return invalid item.
     // Check CRC.
