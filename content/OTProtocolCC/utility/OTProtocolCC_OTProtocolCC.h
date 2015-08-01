@@ -70,10 +70,23 @@ namespace OTProtocolCC
     class CC1Base
         {
         protected:
+            // Create known-invalid instance.
+            CC1Base() : hc1(0xff) { }
+            // Create instance with specified possibly-valid house code.
+            CC1Base(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1), hc2(_hc2) { }
+
             // House code /ID for device.
             // Normally each byte is in the range [0,99].
             // Anything other than 0xff can be considered valid.
             uint8_t hc1, hc2;
+
+            // Force instance to invalid state quickly.
+            void forceInvalid() { hc1 = 0xff; }
+
+            // Returns true if the arguments for encodeSimple are sane.
+            // This in part relies on all CC1 messages being the same fixed length.
+            static bool encodeSimpleArgsSane(uint8_t *buf, uint8_t buflen, bool includeCRC)
+                { return((NULL != buf) && (buflen >= (includeCRC ? 8 : 7))); }
 
         public:
             // True if the current state of this CC1 instance is valid.
@@ -128,14 +141,14 @@ namespace OTProtocolCC
             // Factory method to create instance.
             // Invalid parameters (eg 0xff house codes) will be rejected.
             // Returns instance; check isValid().
-            static CC1Alert makeAlert(uint8_t hc1, uint8_t hc2) { CC1Alert r; r.hc1=hc1; r.hc2=hc2; return(r); }
+            static CC1Alert makeAlert(uint8_t hc1, uint8_t hc2) { return(CC1Alert(hc1, hc2)); }
             // True if the current state of this CC1 instance is valid.
             virtual bool isValid() const { return(houseCodeIsValid()); }
             // Encode/decode to/from uint8_t buffer.
             virtual uint8_t encodeSimple(uint8_t *buf, uint8_t buflen, bool includeCRC) const;
             virtual uint8_t decodeSimple(const uint8_t *buf, uint8_t buflen, bool includeCRC);
-//        private:
-//            CC1Alert(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1), hc2(_hc2) { }
+        private:
+            CC1Alert(uint8_t _hc1, uint8_t _hc2) : CC1Base(_hc1, _hc2) { }
         };
 
     // CC1PollAndCommand contains:

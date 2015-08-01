@@ -49,6 +49,22 @@ uint8_t CC1Base::computeSimpleCRC(const uint8_t *buf, uint8_t buflen)
     return(OTRadioLink::crc7_5B_update_nz_ALT);
     }
 
+// Encode in simple form to the uint8_t array (no auth/enc).
+// Returns number of bytes written if successful,
+// 0 if not successful, eg because the buffer is too small.
+uint8_t CC1Alert::encodeSimple(uint8_t *const buf, const uint8_t buflen, const bool includeCRC) const
+    {
+    if(!encodeSimpleArgsSane(buf, buflen, includeCRC)) { return(0); } // FAIL.
+    buf[0] = '!';
+    buf[1] = hc1;
+    buf[2] = hc2;
+    buf[3] = 1;
+    buf[4] = 1;
+    buf[5] = 1;
+    buf[6] = 1;
+    if(includeCRC) { buf[7] = computeSimpleCRC(buf, buflen); } // CRC computation should never fail here.
+    return(true);
+    }
 
 
 
