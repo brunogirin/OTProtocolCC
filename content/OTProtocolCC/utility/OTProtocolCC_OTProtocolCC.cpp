@@ -76,6 +76,8 @@ CC1Alert CC1Alert::decodeAlert(const uint8_t *const buf, const uint8_t buflen)
     if(!decodeSimpleArgsSane(buf, buflen, true)) { return(r); } // FAIL: return invalid item.
     // Check frame type.
     if('!' != buf[0]) { return(r); } // FAIL: return invalid item.
+    // Explicitly test at least first extension byte is as expected.
+    if(1 != buf[3]) { return(r); } // FAIL: return invalid item.
     // Check CRC.
     if(computeSimpleCRC(buf, buflen) != buf[7]) { return(r); } // FAIL: return invalid item.
     // Extract house code.

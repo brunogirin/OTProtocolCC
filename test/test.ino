@@ -159,6 +159,10 @@ static void testCC1Obj()
   AssertIsTrue(a2.isValid());
   AssertIsEqual(99, a2.getHC1());
   AssertIsEqual(99, a2.getHC2());
+  // Check that corrupting any single bit causes message rejection.
+  bufAlert0[OTV0P2BASE::randRNG8() & 7] ^= (1 << (OTV0P2BASE::randRNG8() & 7));
+  a2 = OTProtocolCC::CC1Alert::decodeAlert(bufAlert0, sizeof(bufAlert0));
+  AssertIsTrue(!a2.isValid());
   }
 
 
