@@ -117,9 +117,21 @@ static void testCommonCRC()
   AssertIsEqual(0, OTProtocolCC::CC1Base::computeSimpleCRC(buf, 1));
   AssertIsEqual(0, OTProtocolCC::CC1Base::computeSimpleCRC(buf, 6));
   AssertIsTrue(0 != OTProtocolCC::CC1Base::computeSimpleCRC(buf, OTProtocolCC::CC1Alert::primary_frame_bytes)); // Should be long enough.
+  // CC1Alert contains:
+  //   * House code (hc1, hc2) of valve controller that the alert is being sent from (or on behalf of).
+  //   * Four extension bytes, currently reserved and of value 1.
+  // Should generally be fixed length on the wire, and protected by non-zero version of CRC7_5B.
+  //     '!' hc2 hc2 1 1 1 1 crc
+  // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
+  // Minimal alert with zero house codes.
+  static uint8_t bufAlert0[] = {'!', 0, 0, 1, 1, 1, 1};
+  AssertIsEqual(80, OTProtocolCC::CC1Base::computeSimpleCRC(bufAlert0, sizeof(bufAlert0)));
+  // Minimal alert with non-zero house codes.
+  static uint8_t bufAlert1[] = {'!', 10, 21, 1, 1, 1, 1};
+  AssertIsEqual(55, OTProtocolCC::CC1Base::computeSimpleCRC(bufAlert1, sizeof(bufAlert1)));
   }
-  
-  
+
+
 
 
 
