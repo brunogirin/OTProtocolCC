@@ -66,6 +66,12 @@ uint8_t CC1Alert::encodeSimple(uint8_t *const buf, const uint8_t buflen, const b
     return(true);
     }
 
+// Decode from simple form (no auth/enc) from the uint8_t array.
+// Returns number of bytes read if successful, 0 if not.
+uint8_t CC1Alert::decodeSimple(const uint8_t *const buf, const uint8_t buflen, const bool includeCRC)
+    {
+    return(0); // FIXME: fail
+    }
 
 
 

@@ -134,10 +134,21 @@ static void testCC1Obj()
   Serial.println("CC1Obj");
   const OTProtocolCC::CC1Alert a0 = OTProtocolCC::CC1Alert::makeAlert(0xff, 0);
   AssertIsTrue(!a0.isValid());
-  const OTProtocolCC::CC1Alert a1 = OTProtocolCC::CC1Alert::makeAlert(0, 1);
+  const OTProtocolCC::CC1Alert a1 = OTProtocolCC::CC1Alert::makeAlert(10, 21);
   AssertIsTrue(a1.isValid());
-  AssertIsEqual(0, a1.getHC1());
-  AssertIsEqual(1, a1.getHC2());
+  AssertIsEqual(10, a1.getHC1());
+  AssertIsEqual(21, a1.getHC2());
+  // Try encoding a simple alert.
+  uint8_t buf[13]; // More than long enough.
+  AssertIsTrue(a1.encodeSimple(buf, sizeof(buf), true));
+  AssertIsEqual('!', buf[0]);
+  AssertIsEqual(10,  buf[1]);
+  AssertIsEqual(21,  buf[2]);
+  AssertIsEqual(1,   buf[3]);
+  AssertIsEqual(1,   buf[4]);
+  AssertIsEqual(1,   buf[5]);
+  AssertIsEqual(1,   buf[6]);
+  AssertIsEqual(55,  buf[7]);
   }
 
 
