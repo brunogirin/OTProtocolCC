@@ -81,15 +81,18 @@ namespace OTProtocolCC
             virtual bool isValid() const { return(false); }
 
             // Get house code 1; any non-0xff value is potentially valid.
-            uint8_t getHC1() { return(hc1); }
+            uint8_t getHC1() const { return(hc1); }
             // Get house code 2; any non-0xff value is potentially valid.
-            uint8_t getHC2() { return(hc2); }
+            uint8_t getHC2() const { return(hc2); }
             // True iff the house code is valid (ie neither byte is 0xff).
             bool houseCodeIsValid() const { return((0xff != hc1) && (0xff != hc2)); }
 
             // Encode in simple form to the uint8_t array (no auth/enc).
-            // Returns number of bytes written if successful, 0 if not.
-            //   * includeCRC  if true then append the CRC.
+            // Returns number of bytes written if successful,
+            // 0 if not successful, eg because the buffer is too small.
+            //   * includeCRC  if true then append/set the trailing CRC;
+            //     note that the call will fail and return 0 if the buffer is not large enough
+            //     to accept the CRC as well as the body.
             virtual uint8_t encodeSimple(uint8_t *buf, uint8_t buflen, bool includeCRC) const = 0;
 
             // Decode from simple form (no auth/enc) from the uint8_t array.

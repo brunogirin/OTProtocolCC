@@ -98,7 +98,7 @@ static void testLibVersions()
 #endif
   }
 
-// Do some basic testing.
+// Do some basic testing around the CRC.
 static void testCommonCRC()
   {
   Serial.println("CommonCRC");
@@ -128,7 +128,17 @@ static void testCommonCRC()
   AssertIsEqual(55, OTProtocolCC::CC1Base::computeSimpleCRC(bufAlert1, sizeof(bufAlert1)));
   }
 
-
+// Do some basic testing around the CC1 objects.
+static void testCC1Obj()
+  {
+  Serial.println("CC1Obj");
+  const OTProtocolCC::CC1Alert a0 = OTProtocolCC::CC1Alert::makeAlert(0xff, 0);
+  AssertIsTrue(!a0.isValid());
+  const OTProtocolCC::CC1Alert a1 = OTProtocolCC::CC1Alert::makeAlert(0, 1);
+  AssertIsTrue(a1.isValid());
+  AssertIsEqual(0, a1.getHC1());
+  AssertIsEqual(1, a1.getHC2());
+  }
 
 
 
@@ -156,6 +166,7 @@ void loop()
   testLibVersions();
 
   testCommonCRC();
+  testCC1Obj();
 
 
   // Announce successful loop completion and count.
