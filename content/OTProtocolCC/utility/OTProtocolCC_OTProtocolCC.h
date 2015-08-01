@@ -97,7 +97,8 @@ namespace OTProtocolCC
 
             // Decode from simple form (no auth/enc) from the uint8_t array.
             // Returns number of bytes read if successful, 0 if not.
-            //   * includeCRC  if true then check the CRC.
+            //   * includeCRC  if true then check the CRC
+            //     and include it in the bytes-read count if successful
             virtual uint8_t decodeSimple(const uint8_t *buf, uint8_t buflen, bool includeCRC) = 0;
 
             // Compute the (non-zero) CRC for simple messages, for encode or decode.
