@@ -102,18 +102,24 @@ static void testLibVersions()
   }
 
 // Do some basic testing.
-static void testTEST()
+static void testCommonCRC()
   {
-  Serial.println("TEST");
-//  // Test the 7-bit CRC (0x5b) routine at a few points.
-//  const uint8_t crc0 = OTRadioLink::crc7_5B_update(0, 0); // Minimal stats payload with normal power and minimum temperature.
-//  AssertIsTrueWithErr((0 == crc0), crc0); 
-//  const uint8_t crc1 = OTRadioLink::crc7_5B_update(0x40, 0); // Minimal stats payload with normal power and minimum temperature.
-//  AssertIsTrueWithErr((0x1a == crc1), crc1); 
-//  const uint8_t crc2 = OTRadioLink::crc7_5B_update(0x50, 40); // Minimal stats payload with low power and 20C temperature.
-//  AssertIsTrueWithErr((0x7b == crc2), crc2); 
-//  AssertIsEqual(0x7b, OTRadioLink::crc7_5B_update_nz_final(0x50, 40)); 
+  Serial.println("CommonCRC");
+  uint8_t buf[13]; // More than long enough.
+  // Test that a zero leading byte is rejected with a zero result.
+  buf[0] = 0;
+  AssertIsEqual(0, OTProtocolCC::CC1Base::computeSimpleCRC(buf, sizeof(buf)));
+  // Test that a plausible non-zero byte and long-enough buffer is non-zero.
+  buf[0] = '!';
+  AssertIsTrue(0 != OTProtocolCC::CC1Base::computeSimpleCRC(buf, sizeof(buf)));
+  // Test that a plausible non-zero byte and not-long-enough buffer is rejected with a zero result.
+  buf[0] = '!';
+  AssertIsTrue(0 != OTProtocolCC::CC1Base::computeSimpleCRC(buf, 1));
+  AssertIsTrue(0 != OTProtocolCC::CC1Base::computeSimpleCRC(buf, 6));
+  AssertIsEqual(0, OTProtocolCC::CC1Base::computeSimpleCRC(buf,OTProtocolCC::CC1Alert::primary_frame_bytes)); // Should be long enough.
   }
+  
+  
 
 
 
@@ -140,7 +146,7 @@ void loop()
   testLibVersion();
   testLibVersions();
 
-  testTEST();
+  testCommonCRC();
 
 
   // Announce successful loop completion and count.

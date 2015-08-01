@@ -85,7 +85,7 @@ namespace OTProtocolCC
             // The result should match the actual CRC on decode,
             // and can be used to set the CRC from on encode.
             // Returns 0 (invalid) if the buffer is too short or the message otherwise invalid.
-            uint8_t computeSimpleCRC(const uint8_t *buf, uint8_t buflen);
+            static uint8_t computeSimpleCRC(const uint8_t *buf, uint8_t buflen);
         };
 
     // CC1Alert contains:
