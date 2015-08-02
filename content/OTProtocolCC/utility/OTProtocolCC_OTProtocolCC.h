@@ -220,7 +220,7 @@ namespace OTProtocolCC
     //   * relative-humidity    [0,50] 0-100 in 2% steps (rh)
     //   * temperature-ds18b20  [0,199] 0.000-99.999C in 1/2 C steps, pipe temp (tp)
     //   * temperature-opentrv  [0,199] 0.000-49.999C in 1/4 C steps, room temp (tr)
-    //   * ambient-light        [1,62] no units, dark to light (l)
+    //   * ambient-light        [1,62] no units, dark to light (al)
     //   * switch               [false,true] activation toggle, helps async poll detect intermittent use (s)
     //   * window               [false,true] false=closed,true=open (w)
     //   * syncing              [false,true] if true, (re)syncing to FHT8V (sy)
@@ -233,13 +233,13 @@ namespace OTProtocolCC
     class CC1PollResponse : public CC1Base
         {
         private:
-//            const uint8_t rh;
-//            const uint8_t tp;
-//            const uint16_t tr;
-//            const uint8_t aml:6;
-//            const bool w;
-//            const bool s;
-//            const boot sy;
+            uint8_t rh; // :6;
+            uint8_t tp;
+            uint16_t tr;
+            uint8_t al; // :6;
+            bool w;
+            bool s;
+            bool sy;
         public:
             // Frame type (leading byte for simple encodings).
             static const OTRadioLink::FrameType_V0p2_FS20 frame_type = OTRadioLink::FTp2_CC1PollResponse;
@@ -248,7 +248,29 @@ namespace OTProtocolCC
             static const int primary_frame_bytes = 7;
             // Create known-invalid instance, quickly.
             CC1PollResponse() { }
-
+            // Get attributes/parameters.
+            inline uint8_t getRH() const { return(rh); }
+            inline uint8_t getTP() const { return(tp); }
+            inline uint8_t getTR() const { return(tr); }
+            inline uint8_t getAL() const { return(al); }
+            inline bool getW() const { return(w); }
+            inline bool getS() const { return(s); }
+            inline bool getSY() const { return(sy); }
+            // Factory method to create instance.
+            //   * House code (hc1, hc2) of valve controller that the poll/command is being sent to.
+            //   * relative-humidity    [0,50] 0-100 in 2% steps (rh)
+            //   * temperature-ds18b20  [0,199] 0.000-99.999C in 1/2 C steps, pipe temp (tp)
+            //   * temperature-opentrv  [0,199] 0.000-49.999C in 1/4 C steps, room temp (tr)
+            //   * ambient-light        [1,62] no units, dark to light (al)
+            //   * switch               [false,true] activation toggle, helps async poll detect intermittent use (s)
+            //   * window               [false,true] false=closed,true=open (w)
+            //   * syncing              [false,true] if true, (re)syncing to FHT8V (sy)
+            // Returns instance; check isValid().
+            static CC1PollResponse make(uint8_t hc1, uint8_t hc2,
+                                        uint8_t rh,
+                                        uint8_t tp, uint8_t tr,
+                                        uint8_t al,
+                                        bool s, bool w, bool sy);
             // Encode to uint8_t buffer.
             virtual uint8_t encodeSimple(uint8_t *buf, uint8_t buflen, bool includeCRC) const;
             // Decode from the wire, including CRC, into the current instance.

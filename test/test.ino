@@ -140,7 +140,7 @@ static void testCC1Alert()
   AssertIsEqual(21, a1.getHC2());
   // Try encoding a simple alert.
   uint8_t buf[13]; // More than long enough.
-  AssertIsTrue(a1.encodeSimple(buf, sizeof(buf), true));
+  AssertIsEqual(8, a1.encodeSimple(buf, sizeof(buf), true));
   AssertIsEqual('!', buf[0]); // FTp2_CC1Alert.
   AssertIsEqual(10,  buf[1]);
   AssertIsEqual(21,  buf[2]);
@@ -179,31 +179,34 @@ static void testCC1PAC()
   AssertIsEqual(2, a1.getLC());
   AssertIsEqual(3, a1.getLT());
   AssertIsEqual(1, a1.getLF());
-//  // Try encoding a simple alert.
-//  uint8_t buf[13]; // More than long enough.
-//  AssertIsTrue(a1.encodeSimple(buf, sizeof(buf), true));
-//  AssertIsEqual('!', buf[0]); // FTp2_CC1Alert.
-//  AssertIsEqual(10,  buf[1]);
-//  AssertIsEqual(21,  buf[2]);
-//  AssertIsEqual(1,   buf[3]);
-//  AssertIsEqual(1,   buf[4]);
-//  AssertIsEqual(1,   buf[5]);
-//  AssertIsEqual(1,   buf[6]);
-//  AssertIsEqual(55,  buf[7]);
-//  // Decode alert with non-zero house codes.
-//  uint8_t bufAlert0[] = {'!', 99,99, 1, 1, 1, 1, 12};
-//  OTProtocolCC::CC1Alert a2;
-//  // Bare instance should be invalid by default.
-//  AssertIsTrue(!a2.isValid());
-//  a2.OTProtocolCC::CC1Alert::decodeSimple(bufAlert0, sizeof(bufAlert0));
-//  // After decode instance should be valid and with correct house code.
-//  AssertIsTrue(a2.isValid());
-//  AssertIsEqual(99, a2.getHC1());
-//  AssertIsEqual(99, a2.getHC2());
-//  // Check that corrupting any single bit causes message rejection.
-//  bufAlert0[OTV0P2BASE::randRNG8() & 7] ^= (1 << (OTV0P2BASE::randRNG8() & 7));
-//  a2.OTProtocolCC::CC1Alert::decodeSimple(bufAlert0, sizeof(bufAlert0));
-//  AssertIsTrue(!a2.isValid());
+  // Try encoding a simple instance.
+  uint8_t buf[13]; // More than long enough.
+  AssertIsEqual(8, a1.encodeSimple(buf, sizeof(buf), true));
+  AssertIsEqual('?', buf[0]); // FTp2_CC1Alert.
+  AssertIsEqual(10,  buf[1]);
+  AssertIsEqual(21,  buf[2]);
+  AssertIsEqual(2,   buf[3]);
+  AssertIsEqual((1 << 6) | (3 << 2) | (2), buf[4]);
+  AssertIsEqual(1,   buf[5]);
+  AssertIsEqual(1,   buf[6]);
+  AssertIsEqual(92,  buf[7]);
+  // Decode instance.
+  OTProtocolCC::CC1PollAndCommand a2;
+  // Bare instance should be invalid by default.
+  AssertIsTrue(!a2.isValid());
+  a2.OTProtocolCC::CC1PollAndCommand::decodeSimple(buf, sizeof(buf));
+  // After decode instance should be valid and with correct house code.
+  AssertIsTrue(a2.isValid());
+  AssertIsEqual(10, a2.getHC1());
+  AssertIsEqual(21, a2.getHC2());
+  AssertIsEqual(1, a2.getRP());
+  AssertIsEqual(2, a2.getLC());
+  AssertIsEqual(3, a2.getLT());
+  AssertIsEqual(1, a2.getLF());
+  // Check that corrupting any single bit causes message rejection.
+  buf[OTV0P2BASE::randRNG8() & 7] ^= (1 << (OTV0P2BASE::randRNG8() & 7));
+  a2.OTProtocolCC::CC1PollAndCommand::decodeSimple(buf, sizeof(buf));
+  AssertIsTrue(!a2.isValid());
   }
 
 

@@ -152,9 +152,9 @@ uint8_t CC1PollAndCommand::decodeSimple(const uint8_t *const buf, const uint8_t 
     rp = _rp - 1;
     // Extract light values.
     lc = buf[4] & 3;
-    lt = (buf[4] >> 2) && 0xf;
+    lt = (buf[4] >> 2) & 0xf;
     if(0 == lt) { return(0); } // FAIL.
-    lf = (buf[4] >> 6);
+    lf = (buf[4] >> 6) & 3;
     if(0 == lf) { return(0); } // FAIL.
     // Check CRC.
     if(computeSimpleCRC(buf, buflen) != buf[7]) { return(0); } // FAIL.
@@ -165,6 +165,38 @@ uint8_t CC1PollAndCommand::decodeSimple(const uint8_t *const buf, const uint8_t 
     // Reads a fixed number of bytes when successful.
     return(8);
     }
+
+
+// Factory method to create instance.
+//   * House code (hc1, hc2) of valve controller that the poll/command is being sent to.
+//   * relative-humidity    [0,50] 0-100 in 2% steps (rh)
+//   * temperature-ds18b20  [0,199] 0.000-99.999C in 1/2 C steps, pipe temp (tp)
+//   * temperature-opentrv  [0,199] 0.000-49.999C in 1/4 C steps, room temp (tr)
+//   * ambient-light        [1,62] no units, dark to light (al)
+//   * switch               [false,true] activation toggle, helps async poll detect intermittent use (s)
+//   * window               [false,true] false=closed,true=open (w)
+//   * syncing              [false,true] if true, (re)syncing to FHT8V (sy)
+// Returns instance; check isValid().
+CC1PollResponse CC1PollResponse::make(const uint8_t hc1, const uint8_t hc2,
+                                      const uint8_t rh,
+                                      const uint8_t tp, const uint8_t tr,
+                                      const uint8_t al,
+                                      const bool s, const bool w, const bool sy)
+    {
+    CC1PollResponse r;
+    r.hc1 = hc1;
+    r.hc2 = hc2;
+    r.rh = constrain(rh, 0, 50);
+    r.tp = constrain(tp, 0, 199);
+    r.tr = constrain(tr, 0, 199);
+    r.al = constrain(al, 1, 62);
+    r.s = s;
+    r.w = w;
+    r.sy = sy;
+    return(r);
+    }
+
+
 
 
 
