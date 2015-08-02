@@ -81,7 +81,7 @@ static inline void errorIfNotEqual(int expected, int actual, int delta, int line
 static void testLibVersion()
   {
   Serial.println("LibVersion");
-#if !(0 == ARDUINO_LIB_OTPROTOCOLCC_VERSION_MAJOR) || !(1 == ARDUINO_LIB_OTPROTOCOLCC_VERSION_MINOR)
+#if !(0 == ARDUINO_LIB_OTPROTOCOLCC_VERSION_MAJOR) || !(2 == ARDUINO_LIB_OTPROTOCOLCC_VERSION_MINOR)
 #error Wrong library version!
 #endif
   }
