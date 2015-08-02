@@ -132,9 +132,9 @@ static void testCommonCRC()
 static void testCC1Obj()
   {
   Serial.println("CC1Obj");
-  const OTProtocolCC::CC1Alert a0 = OTProtocolCC::CC1Alert::makeAlert(0xff, 0);
+  const OTProtocolCC::CC1Alert a0 = OTProtocolCC::CC1Alert::make(0xff, 0);
   AssertIsTrue(!a0.isValid());
-  const OTProtocolCC::CC1Alert a1 = OTProtocolCC::CC1Alert::makeAlert(10, 21);
+  const OTProtocolCC::CC1Alert a1 = OTProtocolCC::CC1Alert::make(10, 21);
   AssertIsTrue(a1.isValid());
   AssertIsEqual(10, a1.getHC1());
   AssertIsEqual(21, a1.getHC2());
@@ -154,14 +154,14 @@ static void testCC1Obj()
   OTProtocolCC::CC1Alert a2;
   // Bare instance should be invalid by default.
   AssertIsTrue(!a2.isValid());
-  a2 = OTProtocolCC::CC1Alert::decodeAlert(bufAlert0, sizeof(bufAlert0));
+  a2.OTProtocolCC::CC1Alert::decodeSimple(bufAlert0, sizeof(bufAlert0));
   // After decode instance should be valid and with correct house code.
   AssertIsTrue(a2.isValid());
   AssertIsEqual(99, a2.getHC1());
   AssertIsEqual(99, a2.getHC2());
   // Check that corrupting any single bit causes message rejection.
   bufAlert0[OTV0P2BASE::randRNG8() & 7] ^= (1 << (OTV0P2BASE::randRNG8() & 7));
-  a2 = OTProtocolCC::CC1Alert::decodeAlert(bufAlert0, sizeof(bufAlert0));
+  a2.OTProtocolCC::CC1Alert::decodeSimple(bufAlert0, sizeof(bufAlert0));
   AssertIsTrue(!a2.isValid());
   }
 

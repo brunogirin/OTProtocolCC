@@ -67,25 +67,27 @@ uint8_t CC1Alert::encodeSimple(uint8_t *const buf, const uint8_t buflen, const b
     return(8);
     }
 
-// Factory method to decode an instance from the wire, including CRC.
+
+// Decode from the wire, including CRC, into the current instance.
 // Invalid parameters (eg 0xff house codes) will be rejected.
-// Returns instance; check isValid().
-CC1Alert CC1Alert::decodeAlert(const uint8_t *const buf, const uint8_t buflen)
+// Returns number of bytes read, 0 if unsuccessful; also check isValid().
+uint8_t CC1Alert::decodeSimple(const uint8_t *const buf, const uint8_t buflen)
     {
-    CC1Alert r; // Invalid by default.
+    forceInvalid(); // Invalid by default.
     // Validate args.
-    if(!decodeSimpleArgsSane(buf, buflen, true)) { return(r); } // FAIL: return invalid item.
+    if(!decodeSimpleArgsSane(buf, buflen, true)) { return(0); } // FAIL.
     // Check frame type.
-    if(frame_type /* OTRadioLink::FTp2_CC1Alert */ != buf[0]) { return(r); } // FAIL: return invalid item.
+    if(frame_type /* OTRadioLink::FTp2_CC1Alert */ != buf[0]) { return(0); } // FAIL.
     // Explicitly test at least first extension byte is as expected.
-    if(1 != buf[3]) { return(r); } // FAIL: return invalid item.
+    if(1 != buf[3]) { return(0); } // FAIL.
     // Check CRC.
-    if(computeSimpleCRC(buf, buflen) != buf[7]) { return(r); } // FAIL: return invalid item.
+    if(computeSimpleCRC(buf, buflen) != buf[7]) { return(0); } // FAIL.
     // Extract house code.
-    r.hc1 = buf[1];
-    r.hc2 = buf[2];
+    hc1 = buf[1];
+    hc2 = buf[2];
     // Instance will be valid if house code is.
-    return(r);
+    // Reads a fixed number of bytes when successful.
+    return(8);
     }
 
 //// Decode from simple form (no auth/enc) from the uint8_t array.

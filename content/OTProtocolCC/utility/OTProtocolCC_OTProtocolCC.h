@@ -94,12 +94,6 @@ namespace OTProtocolCC
             static bool decodeSimpleArgsSane(const uint8_t *buf, uint8_t buflen, bool includeCRC)
                 { return((NULL != buf) && /* (0 != buf[0]) && */ (buflen >= (includeCRC ? 8 : 7))); }
 
-//            // Decode from simple form (no auth/enc) from the uint8_t array.
-//            // Returns number of bytes read if successful, 0 if not.
-//            //   * includeCRC  if true then check the CRC
-//            //     and include it in the bytes-read count if successful
-//            virtual uint8_t decodeSimple(const uint8_t *buf, uint8_t buflen, bool includeCRC) = 0;
-
         public:
             // True if the current state of this CC1 instance is valid.
             // Always false for the base instance.
@@ -119,6 +113,11 @@ namespace OTProtocolCC
             //     note that the call will fail and return 0 if the buffer is not large enough
             //     to accept the CRC as well as the body.
             virtual uint8_t encodeSimple(uint8_t *buf, uint8_t buflen, bool includeCRC) const = 0;
+
+            // Decode from the wire, including CRC, into the current instance.
+            // Invalid parameters (eg 0xff house codes) will be rejected.
+            // Returns number of bytes read, 0 if unsuccessful; also check isValid().
+            virtual uint8_t decodeSimple(const uint8_t *buf, uint8_t buflen) = 0;
 
             // Compute the (non-zero) CRC for simple messages, for encode or decode.
             // Nominally looks at the message type to decide who many bytes to apply the CRC to.
@@ -152,18 +151,15 @@ namespace OTProtocolCC
             // Factory method to create instance.
             // Invalid parameters (eg 0xff house codes) will be rejected.
             // Returns instance; check isValid().
-            static inline CC1Alert makeAlert(uint8_t hc1, uint8_t hc2) { return(CC1Alert(hc1, hc2)); }
-            // Factory method to decode an instance from the wire, including CRC.
-            // Invalid parameters (eg 0xff house codes) will be rejected.
-            // Returns instance; check isValid().
-            static CC1Alert decodeAlert(const uint8_t *buf, uint8_t buflen);
+            static inline CC1Alert make(uint8_t hc1, uint8_t hc2) { return(CC1Alert(hc1, hc2)); }
             // True if the current state of this CC1 instance is valid.
             virtual inline bool isValid() const { return(houseCodeIsValid()); }
             // Encode to uint8_t buffer.
             virtual uint8_t encodeSimple(uint8_t *buf, uint8_t buflen, bool includeCRC) const;
-//        protected:
-//            // Decode from uint8_t buffer.
-//            /*virtual*/ uint8_t decodeSimple(const uint8_t *buf, uint8_t buflen, bool includeCRC);
+            // Decode from the wire, including CRC, into the current instance.
+            // Invalid parameters (eg 0xff house codes) will be rejected.
+            // Returns number of bytes read, 0 if unsuccessful; also check isValid().
+            virtual uint8_t decodeSimple(const uint8_t *buf, uint8_t buflen);
         private:
             CC1Alert(uint8_t _hc1, uint8_t _hc2) : CC1Base(_hc1, _hc2) { }
         };
@@ -184,26 +180,27 @@ namespace OTProtocolCC
     // This representation is immutable.
     class CC1PollAndCommand : public CC1Base
         {
+        private:
+//            const uint8_t rp:7;
+//            const uint8_t lc:2;
+//            const uint8_t lt:4;
+//            const uint8_t lf:2;
         public:
             // Frame type (leading byte for simple encodings).
             static const OTRadioLink::FrameType_V0p2_FS20 frame_type = OTRadioLink::FTp2_CC1PollAndCmd;
             // Length including leading type, but excluding trailing CRC (to allow other encapsulation).
             // The CRC7_5B is most effective at no more than 7 bytes.
             static const int primary_frame_bytes = 7;
-
-//        CC1PollAndCommand(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1), hc2(_hc2) { }
-//        const uint8_t hc1, hc2;
-//        const uint8_t rp:7;
-//        const uint8_t lc:2;
-//        const uint8_t lt:4;
-//        const uint8_t lf:2;
-//        const uint8_t ext1, ext2;
+            // Create known-invalid instance, quickly.
+            CC1PollAndCommand() { }
 
             // Encode to uint8_t buffer.
             virtual uint8_t encodeSimple(uint8_t *buf, uint8_t buflen, bool includeCRC) const;
-        protected:
-            // Decode from uint8_t buffer.
-            virtual uint8_t decodeSimple(const uint8_t *buf, uint8_t buflen, bool includeCRC);
+
+            // Decode from the wire, including CRC, into the current instance.
+            // Invalid parameters (eg 0xff house codes) will be rejected.
+            // Returns number of bytes read, 0 if unsuccessful; also check isValid().
+            virtual uint8_t decodeSimple(const uint8_t *buf, uint8_t buflen);
         };
 
     // CC1PollResponse contains:
@@ -223,28 +220,29 @@ namespace OTProtocolCC
     // This representation is immutable.
     class CC1PollResponse : public CC1Base
         {
+        private:
+//            const uint8_t rh;
+//            const uint8_t tp;
+//            const uint16_t tr;
+//            const uint8_t aml:6;
+//            const bool w;
+//            const bool s;
+//            const boot sy;
         public:
             // Frame type (leading byte for simple encodings).
             static const OTRadioLink::FrameType_V0p2_FS20 frame_type = OTRadioLink::FTp2_CC1PollResponse;
             // Length including leading type, but excluding trailing CRC (to allow other encapsulation).
             // The CRC7_5B is most effective at no more than 7 bytes.
             static const int primary_frame_bytes = 7;
-
-//        CC1PollResponse(uint8_t _hc1, uint8_t _hc2) : hc1(_hc1), hc2(_hc2)      { }
-//        const uint8_t hc1, hc2;
-//        const uint8_t rh;
-//        const uint8_t tp;
-//        const uint16_t tr;
-//        const uint8_t aml:6;
-//        const bool w;
-//        const bool s;
-//        const boot sy;
+            // Create known-invalid instance, quickly.
+            CC1PollResponse() { }
 
             // Encode to uint8_t buffer.
             virtual uint8_t encodeSimple(uint8_t *buf, uint8_t buflen, bool includeCRC) const;
-        protected:
-            // Decode from uint8_t buffer.
-            virtual uint8_t decodeSimple(const uint8_t *buf, uint8_t buflen, bool includeCRC);
+            // Decode from the wire, including CRC, into the current instance.
+            // Invalid parameters (eg 0xff house codes) will be rejected.
+            // Returns number of bytes read, 0 if unsuccessful; also check isValid().
+            virtual uint8_t decodeSimple(const uint8_t *buf, uint8_t buflen);
         };
 
     }
