@@ -133,7 +133,7 @@ namespace OTProtocolCC
     //   * Four extension bytes, currently reserved and of value 1.
     // Fixed length on the wire, and protected by non-zero version of CRC7_5B.
     // Initial frame-type character is OTRadioLink::FTp2_CC1Alert.
-    //     '!' hc2 hc2 1 1 1 1 crc
+    //     '!' hc2 hc2 1 1 1 1 nzcrc
     // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
     // Protocol note: sent asynchronously by the relay, though not generally at most once every 30s.
     // This message is simple enough that many of the methods can be inline.
@@ -171,7 +171,7 @@ namespace OTProtocolCC
     //   * Two extension bytes, currently reserved and of value 1.
     // Fixed length on the wire, and protected by non-zero version of CRC7_5B.
     // Initial frame-type character is OTRadioLink::FTp2_CC1PollAndCmd.
-    //     '?' hc2 hc2 rp+1 lf|lt|lc 1 1 crc
+    //     '?' hc2 hc2 1+rp lf|lt|lc 1 1 nzcrc
     // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
     // Protocol note: sent asynchronously by the hub to the relay, at least every 15m, generally no more than once per 30s.
     // Protocol note: after ~30m without hearing one of these from its hub a relay may go into fallback mode.
@@ -226,7 +226,7 @@ namespace OTProtocolCC
     //   * syncing              [false,true] if true, (re)syncing to FHT8V (sy)
     // Fixed length on the wire, and protected by non-zero version of CRC7_5B.
     // Initial frame-type character is OTRadioLink::FTp2_CC1PollResponse.
-    //     '*' hc2 hc2 w|s|rh tp tr sy|al|0 crc
+    //     '*' hc2 hc2 w|s|1+rh 1+tp 1+tr sy|al|0 nzcrc
     // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
     // Protocol note: sent synchronously by the relay, within 10s of a poll/cmd from its hub.
     // This representation is immutable.

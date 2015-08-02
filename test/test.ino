@@ -209,6 +209,53 @@ static void testCC1PAC()
   AssertIsTrue(!a2.isValid());
   }
 
+// Do some basic testing of the CC1 Poll-Response object.
+static void testCC1PR()
+  {
+  Serial.println("CC1PR");
+  const OTProtocolCC::CC1PollResponse a0 = OTProtocolCC::CC1PollResponse::make(0xff, 0, 0, 0, 0, 0, false, false, false);
+  AssertIsTrue(!a0.isValid());
+  const OTProtocolCC::CC1PollResponse a1 = OTProtocolCC::CC1PollResponse::make(10, 21, 45, 160, 101, 35, true, false, false);
+  AssertIsTrue(a1.isValid());
+  AssertIsEqual(10, a1.getHC1());
+  AssertIsEqual(21, a1.getHC2());
+  AssertIsEqual(45, a1.getRH());
+  AssertIsEqual(160, a1.getTP());
+  AssertIsEqual(101, a1.getTR());
+  AssertIsEqual(35, a1.getAL());
+  AssertIsEqual(true, a1.getS());
+  AssertIsEqual(false, a1.getW());
+  AssertIsEqual(false, a1.getSY());
+//  // Try encoding a simple instance.
+//  uint8_t buf[13]; // More than long enough.
+//  AssertIsEqual(8, a1.encodeSimple(buf, sizeof(buf), true));
+//  AssertIsEqual('?', buf[0]); // FTp2_CC1Alert.
+//  AssertIsEqual(10,  buf[1]);
+//  AssertIsEqual(21,  buf[2]);
+//  AssertIsEqual(2,   buf[3]);
+//  AssertIsEqual((1 << 6) | (3 << 2) | (2), buf[4]);
+//  AssertIsEqual(1,   buf[5]);
+//  AssertIsEqual(1,   buf[6]);
+//  AssertIsEqual(92,  buf[7]);
+//  // Decode instance.
+//  OTProtocolCC::CC1PollAndCommand a2;
+//  // Bare instance should be invalid by default.
+//  AssertIsTrue(!a2.isValid());
+//  a2.OTProtocolCC::CC1PollAndCommand::decodeSimple(buf, sizeof(buf));
+//  // After decode instance should be valid and with correct house code.
+//  AssertIsTrue(a2.isValid());
+//  AssertIsEqual(10, a2.getHC1());
+//  AssertIsEqual(21, a2.getHC2());
+//  AssertIsEqual(1, a2.getRP());
+//  AssertIsEqual(2, a2.getLC());
+//  AssertIsEqual(3, a2.getLT());
+//  AssertIsEqual(1, a2.getLF());
+//  // Check that corrupting any single bit causes message rejection.
+//  buf[OTV0P2BASE::randRNG8() & 7] ^= (1 << (OTV0P2BASE::randRNG8() & 7));
+//  a2.OTProtocolCC::CC1PollAndCommand::decodeSimple(buf, sizeof(buf));
+//  AssertIsTrue(!a2.isValid());
+  }
+
 
 
 
@@ -237,6 +284,7 @@ void loop()
   testCommonCRC();
   testCC1Alert();
   testCC1PAC();
+  testCC1PR();
 
 
   // Announce successful loop completion and count.

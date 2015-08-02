@@ -116,7 +116,7 @@ CC1PollAndCommand CC1PollAndCommand::make(const uint8_t hc1, const uint8_t hc2,
 // Encode in simple form to the uint8_t array (no auth/enc).
 // Returns number of bytes written if successful,
 // 0 if not successful, eg because the buffer is too small.
-//     '?' hc2 hc2 rp+1 lf|lt|lc 1 1 crc
+//     '?' hc2 hc2 1+rp lf|lt|lc 1 1 nzcrc
 uint8_t CC1PollAndCommand::encodeSimple(uint8_t *const buf, const uint8_t buflen, const bool includeCRC) const
     {
     if(!encodeSimpleArgsSane(buf, buflen, includeCRC)) { return(0); } // FAIL.
@@ -135,7 +135,7 @@ uint8_t CC1PollAndCommand::encodeSimple(uint8_t *const buf, const uint8_t buflen
 // Decode from the wire, including CRC, into the current instance.
 // Invalid parameters (eg 0xff house codes) will be rejected.
 // Returns number of bytes read, 0 if unsuccessful; also check isValid().
-//     '?' hc2 hc2 rp+1 lf|lt|lc 1 1 crc
+//     '?' hc2 hc2 1+rp lf|lt|lc 1 1 nzcrc
 uint8_t CC1PollAndCommand::decodeSimple(const uint8_t *const buf, const uint8_t buflen)
     {
     forceInvalid(); // Invalid by default.
@@ -196,6 +196,59 @@ CC1PollResponse CC1PollResponse::make(const uint8_t hc1, const uint8_t hc2,
     return(r);
     }
 
+
+// Encode in simple form to the uint8_t array (no auth/enc).
+// Returns number of bytes written if successful,
+// 0 if not successful, eg because the buffer is too small.
+//     '*' hc2 hc2 w|s|1+rh 1+tp 1+tr sy|al|0 nzcrc
+uint8_t CC1PollResponse::encodeSimple(uint8_t *const buf, const uint8_t buflen, const bool includeCRC) const
+    {
+    if(!encodeSimpleArgsSane(buf, buflen, includeCRC)) { return(0); } // FAIL.
+    buf[0] = frame_type; // OTRadioLink::FTp2_CC1Alert;
+    buf[1] = hc1;
+    buf[2] = hc2;
+// TODO
+//    buf[3] = rp + 1;
+//    buf[4] = (lf << 6) | ((lt << 2) & 0x3c) | (lc & 3);
+//    buf[5] = 1;
+//    buf[6] = 1;
+    if(!includeCRC) { return(7); }
+    buf[7] = computeSimpleCRC(buf, buflen); // CRC computation should never fail here.
+    return(8);
+    }
+
+// Decode from the wire, including CRC, into the current instance.
+// Invalid parameters (eg 0xff house codes) will be rejected.
+// Returns number of bytes read, 0 if unsuccessful; also check isValid().
+//     '*' hc2 hc2 w|s|1+rh 1+tp 1+tr sy|al|0 nzcrc
+uint8_t CC1PollResponse::decodeSimple(const uint8_t *const buf, const uint8_t buflen)
+    {
+    forceInvalid(); // Invalid by default.
+    // Validate args.
+    if(!decodeSimpleArgsSane(buf, buflen, true)) { return(0); } // FAIL.
+    // Check frame type.
+    if(frame_type /* OTRadioLink::FTp2_CC1PollResponse */ != buf[0]) { return(0); } // FAIL.
+// TODO
+//    // Check inbound values for validity.
+//    // Extract RH%.
+//    const uint8_t _rp = buf[3];
+//    if((0 == rp) || (rp > 101)) { return(0); } // FAIL.
+//    rp = _rp - 1;
+//    // Extract light values.
+//    lc = buf[4] & 3;
+//    lt = (buf[4] >> 2) & 0xf;
+//    if(0 == lt) { return(0); } // FAIL.
+//    lf = (buf[4] >> 6) & 3;
+//    if(0 == lf) { return(0); } // FAIL.
+    // Check CRC.
+    if(computeSimpleCRC(buf, buflen) != buf[7]) { return(0); } // FAIL.
+    // Extract house code last, leaving object invalid if bad value forced abort above.
+    hc1 = buf[1];
+    hc2 = buf[2];
+    // Instance will be valid if house code is.
+    // Reads a fixed number of bytes when successful.
+    return(8);
+    }
 
 
 
