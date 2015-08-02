@@ -14,9 +14,17 @@ pending:
 
 
 20150802:
+    freezepoint name: V0.2
+    branch name: HEAD
+    Deployed where: 16WW (released copy on https://github.com/opentrv/OTProtocolCC V0.2).
+    Changes since last freezepoint (developer/mgr initials and brief description): 
+    Previous significant freezepoint: V0.1
+
+
+20150802:
     freezepoint name: V0.1
     branch name: HEAD
-    Deployed where:  (released copy on https://github.com/opentrv/OTProtocolCC ???).
+    Deployed where:  (released copy on https://github.com/opentrv/OTProtocolCC V0.1).
     Changes since last freezepoint (developer/mgr initials and brief description): 
     Previous significant freezepoint:
     DHD20150802: freeze with basic alert TX/RX probably working
