@@ -9,10 +9,17 @@ or release/freeze points.
 
 
 pending:
-    DHD20150728: setting up structure
 
 
 
+
+20150802:
+    freezepoint name: V0.1
+    branch name: HEAD
+    Deployed where:  (released copy on https://github.com/opentrv/OTProtocolCC ???).
+    Changes since last freezepoint (developer/mgr initials and brief description): 
+    Previous significant freezepoint:
+    DHD20150802: freeze with basic alert TX/RX probably working
 
 20150728:
     freezepoint name:
@@ -20,3 +27,5 @@ pending:
     Deployed where:  (released copy on https://github.com/opentrv/OTProtocolCC ???).
     Changes since last freezepoint (developer/mgr initials and brief description): 
     Previous significant freezepoint:
+    DHD20150728: setting up structure
+    
