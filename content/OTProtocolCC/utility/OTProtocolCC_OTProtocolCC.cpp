@@ -62,8 +62,9 @@ uint8_t CC1Alert::encodeSimple(uint8_t *const buf, const uint8_t buflen, const b
     buf[4] = 1;
     buf[5] = 1;
     buf[6] = 1;
-    if(includeCRC) { buf[7] = computeSimpleCRC(buf, buflen); } // CRC computation should never fail here.
-    return(true);
+    if(!includeCRC) { return(7); }
+    buf[7] = computeSimpleCRC(buf, buflen); // CRC computation should never fail here.
+    return(8);
     }
 
 // Factory method to decode an instance from the wire, including CRC.
