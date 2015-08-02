@@ -18,6 +18,7 @@ Author(s) / Copyright (s): Damon Hart-Davis 2015
 
 #include "OTProtocolCC_OTProtocolCC.h"
 
+#include <Arduino.h>
 #include <OTRadioLink.h>
 
 // Use namespaces to help avoid collisions.
@@ -90,13 +91,80 @@ uint8_t CC1Alert::decodeSimple(const uint8_t *const buf, const uint8_t buflen)
     return(8);
     }
 
-//// Decode from simple form (no auth/enc) from the uint8_t array.
-//// Returns number of bytes read if successful, 0 if not.
-//uint8_t CC1Alert::decodeSimple(const uint8_t *const buf, const uint8_t buflen, const bool includeCRC)
-//    {
-//    return(0); // FIXME: fail
-//    }
+// Factory method to create instance.
+// Invalid parameters (except house codes) will be coerced into range.
+//   * House code (hc1, hc2) of valve controller that the poll/command is being sent to.
+//   * rad-open-percent     [0,100] 0-100 in 1% steps, percent open approx to set rad valve (rp)
+//   * light-colour         [0,3] bit flags 1==red 2==green (lc) 0 => stop everything
+//   * light-on-time        [1,15] (0 not allowed) 30-450s in units of 30s (lt) ???
+//   * light-flash          [1,3] (0 not allowed) 1==single 2==double 3==on (lf)
+// Returns instance; check isValid().
+CC1PollAndCommand CC1PollAndCommand::make(const uint8_t hc1, const uint8_t hc2,
+                                          const uint8_t rp,
+                                          const uint8_t lc, const uint8_t lt, const uint8_t lf)
+    {
+    CC1PollAndCommand r;
+    r.hc1 = hc1;
+    r.hc2 = hc2;
+    r.rp = constrain(rp, 0, 100);
+    r.lc = lc & 3; // Logical bit pattern for LEDs.
+    r.lt = constrain(lt, 1, 15);
+    r.lf = constrain(lf, 1, 3);
+    return(r);
+    }
 
+// Encode in simple form to the uint8_t array (no auth/enc).
+// Returns number of bytes written if successful,
+// 0 if not successful, eg because the buffer is too small.
+//     '?' hc2 hc2 rp+1 lf|lt|lc 1 1 crc
+uint8_t CC1PollAndCommand::encodeSimple(uint8_t *const buf, const uint8_t buflen, const bool includeCRC) const
+    {
+    if(!encodeSimpleArgsSane(buf, buflen, includeCRC)) { return(0); } // FAIL.
+    buf[0] = frame_type; // OTRadioLink::FTp2_CC1Alert;
+    buf[1] = hc1;
+    buf[2] = hc2;
+    buf[3] = rp + 1;
+    buf[4] = (lf << 6) | ((lt << 2) & 0x3c) | (lc & 3);
+    buf[5] = 1;
+    buf[6] = 1;
+    if(!includeCRC) { return(7); }
+    buf[7] = computeSimpleCRC(buf, buflen); // CRC computation should never fail here.
+    return(8);
+    }
+
+// Decode from the wire, including CRC, into the current instance.
+// Invalid parameters (eg 0xff house codes) will be rejected.
+// Returns number of bytes read, 0 if unsuccessful; also check isValid().
+//     '?' hc2 hc2 rp+1 lf|lt|lc 1 1 crc
+uint8_t CC1PollAndCommand::decodeSimple(const uint8_t *const buf, const uint8_t buflen)
+    {
+    forceInvalid(); // Invalid by default.
+    // Validate args.
+    if(!decodeSimpleArgsSane(buf, buflen, true)) { return(0); } // FAIL.
+    // Check frame type.
+    if(frame_type /* OTRadioLink::FTp2_CC1PollAndCommand */ != buf[0]) { return(0); } // FAIL.
+    // Explicitly test at least first extension byte is as expected.
+    if(1 != buf[5]) { return(0); } // FAIL.
+    // Check inbound values for validity.
+    // Extract RH%.
+    const uint8_t _rp = buf[3];
+    if((0 == rp) || (rp > 101)) { return(0); } // FAIL.
+    rp = _rp - 1;
+    // Extract light values.
+    lc = buf[4] & 3;
+    lt = (buf[4] >> 2) && 0xf;
+    if(0 == lt) { return(0); } // FAIL.
+    lf = (buf[4] >> 6);
+    if(0 == lf) { return(0); } // FAIL.
+    // Check CRC.
+    if(computeSimpleCRC(buf, buflen) != buf[7]) { return(0); } // FAIL.
+    // Extract house code last, leaving object invalid if bad value forced abort above.
+    hc1 = buf[1];
+    hc2 = buf[2];
+    // Instance will be valid if house code is.
+    // Reads a fixed number of bytes when successful.
+    return(8);
+    }
 
 
 

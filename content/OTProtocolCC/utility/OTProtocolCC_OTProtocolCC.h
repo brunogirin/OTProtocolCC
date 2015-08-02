@@ -96,8 +96,8 @@ namespace OTProtocolCC
 
         public:
             // True if the current state of this CC1 instance is valid.
-            // Always false for the base instance.
-            virtual bool isValid() const { return(false); }
+            // By default false if house codes invalid (eg as achieved with forceInvalid()).
+            virtual bool isValid() const { return(houseCodeIsValid()); }
 
             // Get house code 1; any non-0xff value is potentially valid.
             uint8_t getHC1() const { return(hc1); }
@@ -152,8 +152,6 @@ namespace OTProtocolCC
             // Invalid parameters (eg 0xff house codes) will be rejected.
             // Returns instance; check isValid().
             static inline CC1Alert make(uint8_t hc1, uint8_t hc2) { return(CC1Alert(hc1, hc2)); }
-            // True if the current state of this CC1 instance is valid.
-            virtual inline bool isValid() const { return(houseCodeIsValid()); }
             // Encode to uint8_t buffer.
             virtual uint8_t encodeSimple(uint8_t *buf, uint8_t buflen, bool includeCRC) const;
             // Decode from the wire, including CRC, into the current instance.
@@ -173,7 +171,7 @@ namespace OTProtocolCC
     //   * Two extension bytes, currently reserved and of value 1.
     // Fixed length on the wire, and protected by non-zero version of CRC7_5B.
     // Initial frame-type character is OTRadioLink::FTp2_CC1PollAndCmd.
-    //     '?' hc2 hc2 rp lf|lt|lc 1 1 crc
+    //     '?' hc2 hc2 rp+1 lf|lt|lc 1 1 crc
     // Note that most values are whitened to be neither 0x00 nor 0xff on the wire.
     // Protocol note: sent asynchronously by the hub to the relay, at least every 15m, generally no more than once per 30s.
     // Protocol note: after ~30m without hearing one of these from its hub a relay may go into fallback mode.
@@ -181,10 +179,10 @@ namespace OTProtocolCC
     class CC1PollAndCommand : public CC1Base
         {
         private:
-//            const uint8_t rp:7;
-//            const uint8_t lc:2;
-//            const uint8_t lt:4;
-//            const uint8_t lf:2;
+            uint8_t rp; // :7;
+            uint8_t lc; // :2;
+            uint8_t lt; // :4;
+            uint8_t lf; // :2;
         public:
             // Frame type (leading byte for simple encodings).
             static const OTRadioLink::FrameType_V0p2_FS20 frame_type = OTRadioLink::FTp2_CC1PollAndCmd;
@@ -193,10 +191,24 @@ namespace OTProtocolCC
             static const int primary_frame_bytes = 7;
             // Create known-invalid instance, quickly.
             CC1PollAndCommand() { }
-
+            // Get attributes/parameters.
+            inline uint8_t getRP() const { return(rp); }
+            inline uint8_t getLC() const { return(lc); }
+            inline uint8_t getLT() const { return(lt); }
+            inline uint8_t getLF() const { return(lf); }
+            // Factory method to create instance.
+            // Invalid parameters (except house codes) will be coerced into range.
+            //   * House code (hc1, hc2) of valve controller that the poll/command is being sent to.
+            //   * rad-open-percent     [0,100] 0-100 in 1% steps, percent open approx to set rad valve (rp)
+            //   * light-colour         [0,3] bit flags 1==red 2==green (lc) 0 => stop everything
+            //   * light-on-time        [1,15] (0 not allowed) 30-450s in units of 30s (lt) ???
+            //   * light-flash          [1,3] (0 not allowed) 1==single 2==double 3==on (lf)
+            // Returns instance; check isValid().
+            static CC1PollAndCommand make(uint8_t hc1, uint8_t hc2,
+                                          uint8_t rp,
+                                          uint8_t lc, uint8_t lt, uint8_t lf);
             // Encode to uint8_t buffer.
             virtual uint8_t encodeSimple(uint8_t *buf, uint8_t buflen, bool includeCRC) const;
-
             // Decode from the wire, including CRC, into the current instance.
             // Invalid parameters (eg 0xff house codes) will be rejected.
             // Returns number of bytes read, 0 if unsuccessful; also check isValid().
