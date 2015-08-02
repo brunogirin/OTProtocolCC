@@ -146,9 +146,8 @@ uint8_t CC1PollAndCommand::decodeSimple(const uint8_t *const buf, const uint8_t 
     // Explicitly test at least first extension byte is as expected.
     if(1 != buf[5]) { return(0); } // FAIL.
     // Check inbound values for validity.
-    // Extract RH%.
     const uint8_t _rp = buf[3];
-    if((0 == rp) || (rp > 101)) { return(0); } // FAIL.
+    if((0 == _rp) || (_rp > 101)) { return(0); } // FAIL.
     rp = _rp - 1;
     // Extract light values.
     lc = buf[4] & 3;
@@ -196,7 +195,6 @@ CC1PollResponse CC1PollResponse::make(const uint8_t hc1, const uint8_t hc2,
     return(r);
     }
 
-
 // Encode in simple form to the uint8_t array (no auth/enc).
 // Returns number of bytes written if successful,
 // 0 if not successful, eg because the buffer is too small.
@@ -207,11 +205,13 @@ uint8_t CC1PollResponse::encodeSimple(uint8_t *const buf, const uint8_t buflen, 
     buf[0] = frame_type; // OTRadioLink::FTp2_CC1Alert;
     buf[1] = hc1;
     buf[2] = hc2;
-// TODO
-//    buf[3] = rp + 1;
-//    buf[4] = (lf << 6) | ((lt << 2) & 0x3c) | (lc & 3);
-//    buf[5] = 1;
-//    buf[6] = 1;
+    buf[3] = rh + 1;
+    if(w) { buf[3] |= 0x80; }
+    if(s) { buf[3] |= 0x40; }
+    buf[4] = tp + 1;
+    buf[5] = tr + 1;
+    buf[6] = (al << 1);
+    if(sy) { buf[6] |= 0x80; }
     if(!includeCRC) { return(7); }
     buf[7] = computeSimpleCRC(buf, buflen); // CRC computation should never fail here.
     return(8);
@@ -229,17 +229,23 @@ uint8_t CC1PollResponse::decodeSimple(const uint8_t *const buf, const uint8_t bu
     // Check frame type.
     if(frame_type /* OTRadioLink::FTp2_CC1PollResponse */ != buf[0]) { return(0); } // FAIL.
 // TODO
-//    // Check inbound values for validity.
-//    // Extract RH%.
-//    const uint8_t _rp = buf[3];
-//    if((0 == rp) || (rp > 101)) { return(0); } // FAIL.
-//    rp = _rp - 1;
-//    // Extract light values.
-//    lc = buf[4] & 3;
-//    lt = (buf[4] >> 2) & 0xf;
-//    if(0 == lt) { return(0); } // FAIL.
-//    lf = (buf[4] >> 6) & 3;
-//    if(0 == lf) { return(0); } // FAIL.
+    // Check inbound values for validity.
+    // Extract RH%.
+    const uint8_t _rh = (buf[3] & 0x3f);
+    if((0 == _rh) || (_rh > 51)) { return(0); } // FAIL.
+    rh = _rh - 1;
+    w = (0 != (0x80 & buf[3]));
+    s = (0 != (0x40 & buf[3]));
+    const uint8_t _tp = buf[4];
+    if((0 == _tp) || (_tp > 200)) { return(0); } // FAIL.
+    tp = _tp - 1;
+    const uint8_t _tr = buf[5];
+    if((0 == _tr) || (_tr > 200)) { return(0); } // FAIL.
+    tr = _tr - 1;
+    const uint8_t _al = (buf[6] >> 1) & 0x3f;
+    if((0 == _al) || (0x3f == _al)) { return(0); } // FAIL.
+    al = _al;
+    s = (0 != (0x40 & buf[6]));
     // Check CRC.
     if(computeSimpleCRC(buf, buflen) != buf[7]) { return(0); } // FAIL.
     // Extract house code last, leaving object invalid if bad value forced abort above.
