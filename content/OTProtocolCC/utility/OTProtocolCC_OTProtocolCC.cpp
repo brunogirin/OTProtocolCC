@@ -152,9 +152,9 @@ uint8_t CC1PollAndCommand::decodeSimple(const uint8_t *const buf, const uint8_t 
     rp = _rp - 1;
     // Extract light values.
     lc = buf[4] & 3;
-    lt = (buf[4] >> 2) && 0xf;
+    lt = (buf[4] >> 2) & 0xf;
     if(0 == lt) { return(0); } // FAIL.
-    lf = (buf[4] >> 6);
+    lf = (buf[4] >> 6) & 3;
     if(0 == lf) { return(0); } // FAIL.
     // Check CRC.
     if(computeSimpleCRC(buf, buflen) != buf[7]) { return(0); } // FAIL.
