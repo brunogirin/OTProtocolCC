@@ -10,7 +10,8 @@ or release/freeze points.
 
 pending:
     DHD20150802: starting on V0.3...
-    DHD20150803: bug fixes in poll response decode/encode
+    DHD20150803: bug fixes in poll response decode/encode.
+    DHD20150803: disconnected OT UI for COHEAT hub/relay.
 
 
 
@@ -28,7 +29,7 @@ pending:
     Deployed where:  (released copy on https://github.com/opentrv/OTProtocolCC V0.1).
     Changes since last freezepoint (developer/mgr initials and brief description): 
     Previous significant freezepoint:
-    DHD20150802: freeze with basic alert TX/RX probably working
+    DHD20150802: freeze with basic alert TX/RX probably working.
 
 20150728:
     freezepoint name:
@@ -36,5 +37,5 @@ pending:
     Deployed where:  (released copy on https://github.com/opentrv/OTProtocolCC ???).
     Changes since last freezepoint (developer/mgr initials and brief description): 
     Previous significant freezepoint:
-    DHD20150728: setting up structure
+    DHD20150728: setting up structure.
     
