@@ -9,11 +9,19 @@ or release/freeze points.
 
 
 pending:
-    DHD20150802: starting on V0.3...
+
+
+
+
+
+
+20150804:
+    freezepoint name: V0.3
+    branch name: HEAD
+    Deployed where:  (released copy on https://github.com/opentrv/OTProtocolCC V0.3).
+    Changes since last freezepoint (developer/mgr initials and brief description): 
+    Previous significant freezepoint: V0.2
     DHD20150803: bug fixes in poll response decode/encode.
-    DHD20150803: disconnected OT UI for COHEAT hub/relay.
-
-
 
 20150802:
     freezepoint name: V0.2
@@ -21,7 +29,6 @@ pending:
     Deployed where: 16WW (released copy on https://github.com/opentrv/OTProtocolCC V0.2).
     Changes since last freezepoint (developer/mgr initials and brief description): 
     Previous significant freezepoint: V0.1
-
 
 20150802:
     freezepoint name: V0.1
