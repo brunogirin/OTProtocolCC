@@ -10,6 +10,7 @@ or release/freeze points.
 
 pending:
     DHD20150802: starting on V0.3...
+    DHD20150803: bug fixes in poll response decode/encode
 
 
 

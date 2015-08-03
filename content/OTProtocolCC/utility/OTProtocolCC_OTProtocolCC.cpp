@@ -146,9 +146,9 @@ uint8_t CC1PollAndCommand::decodeSimple(const uint8_t *const buf, const uint8_t 
     // Explicitly test at least first extension byte is as expected.
     if(1 != buf[5]) { return(0); } // FAIL.
     // Check inbound values for validity.
-    const uint8_t _rp = buf[3];
-    if((0 == _rp) || (_rp > 101)) { return(0); } // FAIL.
-    rp = _rp - 1;
+    const uint8_t _rp = buf[3] - 1;
+    if(_rp >= 101) { return(0); } // FAIL.
+    rp = _rp;
     // Extract light values.
     lc = buf[4] & 3;
     lt = (buf[4] >> 2) & 0xf;
@@ -236,16 +236,16 @@ uint8_t CC1PollResponse::decodeSimple(const uint8_t *const buf, const uint8_t bu
     rh = _rh - 1;
     w = (0 != (0x80 & buf[3]));
     s = (0 != (0x40 & buf[3]));
-    const uint8_t _tp = buf[4];
-    if((0 == _tp) || (_tp > 200)) { return(0); } // FAIL.
-    tp = _tp - 1;
-    const uint8_t _tr = buf[5];
-    if((0 == _tr) || (_tr > 200)) { return(0); } // FAIL.
-    tr = _tr - 1;
+    const uint8_t _tp = buf[4] - 1;
+    if(_tp >= 200) { return(0); } // FAIL.
+    tp = _tp;
+    const uint8_t _tr = buf[5] - 1;
+    if(_tr >= 200) { return(0); } // FAIL.
+    tr = _tr;
     const uint8_t _al = (buf[6] >> 1) & 0x3f;
     if((0 == _al) || (0x3f == _al)) { return(0); } // FAIL.
     al = _al;
-    s = (0 != (0x40 & buf[6]));
+    sy = (0 != (0x80 & buf[6]));
     // Check CRC.
     if(computeSimpleCRC(buf, buflen) != buf[7]) { return(0); } // FAIL.
     // Extract house code last, leaving object invalid if bad value forced abort above.
