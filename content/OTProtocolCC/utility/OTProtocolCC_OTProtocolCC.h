@@ -165,8 +165,8 @@ namespace OTProtocolCC
     // CC1PollAndCommand contains:
     //   * House code (hc1, hc2) of valve controller that the poll/command is being sent to.
     //   * rad-open-percent     [0,100] 0-100 in 1% steps, percent open approx to set rad valve (rp)
-    //   * light-colour         [0,3] bit flags 1==red 2==green (lc) 0 => stop everything
-    //   * light-on-time        [1,15] (0 not allowed) 30-450s in units of 30s (lt) ???
+    //   * light-colour         [0,3] bit flags 1==red 2==green 0 => stop everything (lc)
+    //   * light-on-time        [1,15] (0 not allowed) 30-450s in units of 30s (lt)
     //   * light-flash          [1,3] (0 not allowed) 1==single 2==double 3==on (lf)
     //   * Two extension bytes, currently reserved and of value 1.
     // Fixed length on the wire, and protected by non-zero version of CRC7_5B.
@@ -200,8 +200,8 @@ namespace OTProtocolCC
             // Invalid parameters (except house codes) will be coerced into range.
             //   * House code (hc1, hc2) of valve controller that the poll/command is being sent to.
             //   * rad-open-percent     [0,100] 0-100 in 1% steps, percent open approx to set rad valve (rp)
-            //   * light-colour         [0,3] bit flags 1==red 2==green (lc) 0 => stop everything
-            //   * light-on-time        [1,15] (0 not allowed) 30-450s in units of 30s (lt) ???
+            //   * light-colour         [0,3] bit flags 1==red 2==green 0 => stop everything (lc)
+            //   * light-on-time        [1,15] (0 not allowed) 30-450s in units of 30s (lt)
             //   * light-flash          [1,3] (0 not allowed) 1==single 2==double 3==on (lf)
             // Returns instance; check isValid().
             static CC1PollAndCommand make(uint8_t hc1, uint8_t hc2,
