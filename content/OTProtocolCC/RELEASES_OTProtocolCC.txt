@@ -9,7 +9,7 @@ or release/freeze points.
 
 
 pending:
-
+    DHD20150905: attempting to add C++ nature to Eclipse project.
 
 
 
