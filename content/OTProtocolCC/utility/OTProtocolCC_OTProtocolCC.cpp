@@ -116,7 +116,7 @@ CC1PollAndCommand CC1PollAndCommand::make(const uint8_t hc1, const uint8_t hc2,
 // Encode in simple form to the uint8_t array (no auth/enc).
 // Returns number of bytes written if successful,
 // 0 if not successful, eg because the buffer is too small.
-//     '?' hc2 hc2 1+rp lf|lt|lc 1 1 nzcrc
+//     '?' hc1 hc2 1+rp lf|lt|lc 1 1 nzcrc
 uint8_t CC1PollAndCommand::encodeSimple(uint8_t *const buf, const uint8_t buflen, const bool includeCRC) const
     {
     if(!encodeSimpleArgsSane(buf, buflen, includeCRC)) { return(0); } // FAIL.
@@ -135,7 +135,7 @@ uint8_t CC1PollAndCommand::encodeSimple(uint8_t *const buf, const uint8_t buflen
 // Decode from the wire, including CRC, into the current instance.
 // Invalid parameters (eg 0xff house codes) will be rejected.
 // Returns number of bytes read, 0 if unsuccessful; also check isValid().
-//     '?' hc2 hc2 1+rp lf|lt|lc 1 1 nzcrc
+//     '?' hc1 hc2 1+rp lf|lt|lc 1 1 nzcrc
 uint8_t CC1PollAndCommand::decodeSimple(const uint8_t *const buf, const uint8_t buflen)
     {
     forceInvalid(); // Invalid by default.
@@ -198,7 +198,7 @@ CC1PollResponse CC1PollResponse::make(const uint8_t hc1, const uint8_t hc2,
 // Encode in simple form to the uint8_t array (no auth/enc).
 // Returns number of bytes written if successful,
 // 0 if not successful, eg because the buffer is too small.
-//     '*' hc2 hc2 w|s|1+rh 1+tp 1+tr sy|al|0 nzcrc
+//     '*' hc1 hc2 w|s|1+rh 1+tp 1+tr sy|al|0 nzcrc
 uint8_t CC1PollResponse::encodeSimple(uint8_t *const buf, const uint8_t buflen, const bool includeCRC) const
     {
     if(!encodeSimpleArgsSane(buf, buflen, includeCRC)) { return(0); } // FAIL.
@@ -220,7 +220,7 @@ uint8_t CC1PollResponse::encodeSimple(uint8_t *const buf, const uint8_t buflen, 
 // Decode from the wire, including CRC, into the current instance.
 // Invalid parameters (eg 0xff house codes) will be rejected.
 // Returns number of bytes read, 0 if unsuccessful; also check isValid().
-//     '*' hc2 hc2 w|s|1+rh 1+tp 1+tr sy|al|0 nzcrc
+//     '*' hc1 hc2 w|s|1+rh 1+tp 1+tr sy|al|0 nzcrc
 uint8_t CC1PollResponse::decodeSimple(const uint8_t *const buf, const uint8_t buflen)
     {
     forceInvalid(); // Invalid by default.
