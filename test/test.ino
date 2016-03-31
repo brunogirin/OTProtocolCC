@@ -34,8 +34,13 @@ Author(s) / Copyright (s): Damon Hart-Davis 2015
 
 void setup()
   {
+#ifdef ON_V0P2_BOARD
+  // initialize serial communications at 4800 bps for typical use with V0p2 board.
+  Serial.begin(4800);
+#else
   // initialize serial communications at 9600 bps for typical use with (eg) Arduino UNO.
-  Serial.begin(9600); 
+  Serial.begin(9600);
+#endif
   }
 
 
@@ -90,10 +95,10 @@ static void testLibVersion()
 static void testLibVersions()
   {
   Serial.println("LibVersions");
-#if !(0 == ARDUINO_LIB_OTV0P2BASE_VERSION_MAJOR) || !(6 <= ARDUINO_LIB_OTV0P2BASE_VERSION_MINOR)
+#if !(1 == ARDUINO_LIB_OTV0P2BASE_VERSION_MAJOR) || !(0 <= ARDUINO_LIB_OTV0P2BASE_VERSION_MINOR)
 #error Wrong OTV0p2Base library version!
 #endif  
-#if !(0 == ARDUINO_LIB_OTRADIOLINK_VERSION_MAJOR) || !(6 <= ARDUINO_LIB_OTRADIOLINK_VERSION_MINOR)
+#if !(1 == ARDUINO_LIB_OTRADIOLINK_VERSION_MAJOR) || !(0 <= ARDUINO_LIB_OTRADIOLINK_VERSION_MINOR)
 #error Wrong OTRadioLink library version!
 #endif
   }
@@ -272,7 +277,7 @@ void loop()
   // Allow the terminal console to be brought up.
   for(int i = 3; i > 0; --i)
     {
-    Serial.print(F("Tests (compiled "__TIME__") starting... " ));
+//    Serial.print(F("Tests (compiled "__TIME__") starting... " )); // FIXME! commented this as it was preventing compilation and is not present in other test.inos
     Serial.print(i);
     Serial.println();
     delay(1000);
