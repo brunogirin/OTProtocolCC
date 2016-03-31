@@ -9,12 +9,19 @@ or release/freeze points.
 
 
 pending:
+    
+
+
+
+
+20160331:
+    freezepoint name: V1.0
+    branch name: HEAD
+    Deployed where: Production
+    Changes since last freezepoint (developer/mgr initials and brief description):
+    Previous significant freezepoint: V0.3
     DHD20150905: attempting to add C++ nature to Eclipse project.
-
-
-
-
-
+    
 20150804:
     freezepoint name: V0.3
     branch name: HEAD
