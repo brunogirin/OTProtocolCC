@@ -106,7 +106,7 @@ CC1PollAndCommand CC1PollAndCommand::make(const uint8_t hc1, const uint8_t hc2,
     CC1PollAndCommand r;
     r.hc1 = hc1;
     r.hc2 = hc2;
-    r.rp = constrain(rp, 0, 100);
+    r.rp = min(rp, 100);
     r.lc = lc & 3; // Logical bit pattern for LEDs.
     r.lt = constrain(lt, 1, 15);
     r.lf = constrain(lf, 1, 3);
@@ -185,9 +185,9 @@ CC1PollResponse CC1PollResponse::make(const uint8_t hc1, const uint8_t hc2,
     CC1PollResponse r;
     r.hc1 = hc1;
     r.hc2 = hc2;
-    r.rh = constrain(rh, 0, 50);
-    r.tp = constrain(tp, 0, 199);
-    r.tr = constrain(tr, 0, 199);
+    r.rh = min(rh, 50);
+    r.tp = min(tp, 199);
+    r.tr = min(tr, 199);
     r.al = constrain(al, 1, 62);
     r.s = s;
     r.w = w;
